@@ -48,80 +48,31 @@
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         .clock { font-family: monospace; font-size: 14px; font-weight: 700; color: #94a3b8; }
 
-        /* --- THE CLIPPING MASK (The "Cardboard Cutout") --- */
+        /* --- THE CLIPPING MASK --- */
         .viewer-container {
             flex-grow: 1;
             width: 100%;
             background: #020617;
             position: relative;
-            
-            /* This hides any part of the iframe that bleeds outside this box */
             overflow: hidden; 
         }
 
         /* --- THE IFRAME MANIPULATION --- */
         .iframe-crop {
             position: absolute;
-            
-            /* 1. HIDE THE TOP MENU: Pushes their website UP out of view */
             top: -120px; 
-            
-            /* 2. HIDE THE SIDE MARGINS: Stretches the frame horizontally */
             left: -20px;
             width: calc(100% + 40px);
-            
-            /* 3. LEAVE THE CONTROLS: Ensures the height allows the image AND the timeline to show */
             height: calc(100% + 150px);
-            
             border: none;
         }
 
-        /* Bottom blackout bar to cover any excess footer from their site below the timeline */
+        /* --- THE FIX: Taller Bottom Blackout Bar --- */
         .bottom-mask {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 25px;
-            background: #020617;
-            z-index: 20;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="top-bar">
-        <div class="brand-container">
-            <i class="fa-solid fa-satellite-dish radar-icon"></i>
-            <div class="title-block">
-                <h1>Tropical WPAC Infrared Stream</h1>
-                <p>Tarlac PDRRMO | CyclonicWX Node</p>
-            </div>
-        </div>
-        <div class="status-block">
-            <div class="live-indicator"><div class="live-dot"></div> Live Connection</div>
-            <div class="clock" id="live-clock">00:00:00</div>
-        </div>
-    </div>
-
-    <div class="viewer-container">
-        
-        <iframe class="iframe-crop" src="https://cyclonicwx.com/floater/nwpac/ir/" scrolling="no"></iframe>
-        
-        <div class="bottom-mask"></div>
-
-    </div>
-
-    <script>
-        // System Clock
-        function updateOperationalClock() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('en-US', { hour12: false });
-            const dateString = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
-            document.getElementById('live-clock').innerText = `${dateString} | ${timeString} PST`;
-        }
-        setInterval(updateOperationalClock, 1000);
-        updateOperationalClock();
-    </script>
-</body>
-</html>
+            /* Increased from 25px to 50px to swallow the footer text */
+            height: 50px; 
+            background: #020617
