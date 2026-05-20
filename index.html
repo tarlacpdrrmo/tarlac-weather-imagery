@@ -3,181 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JMA Himawari-9 Imagery | Tarlac PDRRMO</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
+    <title>WPAC Satellite Loop | Tarlac PDRRMO</title>
     <style>
-        body, html { 
-            margin: 0; padding: 0; 
-            font-family: 'Inter', sans-serif; 
-            background-color: #1e293b; /* Matches the dark gray from your image */
-            color: #f8fafc;
-            height: 100vh; width: 100vw;
-            overflow: hidden;
+        body { 
+            margin: 0; 
+            font-family: Arial, sans-serif; 
+            background: #000000; 
+            color: #ffffff; 
+            text-align: center; 
+            height: 100vh;
             display: flex;
             flex-direction: column;
         }
-
-        /* --- Top Bar (Matches your screenshot) --- */
-        .top-bar {
-            background: #0f172a;
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #38bdf8;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            z-index: 10;
+        
+        /* The Classic Orange Header */
+        .header { 
+            background: #d9534f; 
+            padding: 12px; 
+            font-weight: bold; 
+            font-size: 18px; 
+            border-bottom: 2px solid #ffffff; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* The Gray Control Bar */
+        .control-bar { 
+            background: #e0e0e0; 
+            padding: 10px; 
+            display: flex; 
+            justify-content: center; 
+            gap: 8px; 
+            flex-wrap: wrap; 
+            border-bottom: 1px solid #999;
+        }
+        
+        .control-bar button { 
+            padding: 6px 15px; 
+            font-size: 14px; 
+            cursor: pointer; 
+            border: 1px solid #999; 
+            background: #f8f8f8; 
+            color: #333; 
+            font-weight: bold; 
+            border-radius: 3px; 
+            transition: 0.1s;
+        }
+        
+        .control-bar button:hover { 
+            background: #d4d4d4; 
+            border-color: #666;
         }
 
-        .title-block h1 {
-            margin: 0; font-size: 18px; font-weight: 800; 
-            text-transform: uppercase; color: #f8fafc;
+        .control-bar button:active {
+            background: #bbb;
         }
-        .title-block p {
-            margin: 2px 0 0 0; font-size: 11px; color: #38bdf8; 
-            font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+        
+        .control-bar select { 
+            padding: 5px; 
+            font-size: 14px; 
+            font-weight: bold;
+            border: 1px solid #999;
+            border-radius: 3px;
+        }
+        
+        .frame-counter { 
+            font-size: 14px; 
+            color: #aaaaaa; 
+            margin: 15px 0; 
+            font-weight: bold;
+            font-family: monospace;
+            letter-spacing: 0.5px;
         }
 
-        .live-badge {
-            background: rgba(56, 189, 248, 0.1);
-            border: 1px solid #38bdf8;
-            color: #38bdf8;
-            padding: 6px 15px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* --- The Single Image Viewer --- */
-        .viewer-container {
+        .image-container { 
             flex-grow: 1;
-            width: 100%;
-            background: #000000;
-            overflow: hidden;
+            padding: 0 20px 20px 20px;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             position: relative;
         }
-
-        #satellite-image {
-            /* This zooms the Earth in 2.8x and shifts it to center exactly on the Philippines */
-            transform: scale(2.8) translate(12%, 10%);
-            transition: opacity 0.2s ease-in-out;
-            max-width: 800px;
-        }
-
-        /* --- Loading Overlay --- */
-        #loading-screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 20;
-        }
-        .spinner {
-            border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid #38bdf8;
-            border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* --- Bottom Control Console --- */
-        .control-bar {
-            background: #0f172a;
-            padding: 15px 25px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            z-index: 10;
-        }
-
-        .btn-play {
-            background: #38bdf8; color: #0f172a; width: 40px; height: 40px; 
-            border-radius: 6px; font-size: 16px; border: none; font-weight: 900; 
-            cursor: pointer; display: flex; justify-content: center; align-items: center;
-        }
-        .btn-play:hover { background: #7dd3fc; }
-
-        .timeline-container { flex-grow: 1; display: flex; flex-direction: column; gap: 5px; }
-        .timestamp { font-family: monospace; font-size: 14px; font-weight: 700; color: #e2e8f0; }
         
-        .slider {
-            -webkit-appearance: none; width: 100%; height: 6px; background: #334155; 
-            border-radius: 3px; outline: none; cursor: pointer;
+        #satellite-image { 
+            max-width: 100%; 
+            max-height: 75vh; 
+            border: 1px solid #333; 
+            box-shadow: 0 0 20px rgba(255,255,255,0.05);
+            /* Optional: Adds slight contrast to make clouds pop */
+            filter: contrast(1.1) brightness(1.05); 
         }
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; 
-            background: #38bdf8; cursor: pointer;
+
+        /* Status Indicator during load */
+        #status-text {
+            color: #d9534f;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
     </style>
 </head>
 <body>
 
-    <div class="top-bar">
-        <div class="title-block">
-            <h1>JMA Himawari-9 Imagery</h1>
-            <p>Western Pacific Sector | Infrared</p>
-        </div>
-        <div class="live-badge" id="status-badge">
-            <i class="fa-solid fa-satellite"></i> SYNCING API...
-        </div>
-    </div>
-
-    <div class="viewer-container">
-        <div id="loading-screen">
-            <div class="spinner"></div>
-            <p style="color: #94a3b8; font-family: monospace; margin-top: 15px; font-weight: bold;">Downloading latest frames...</p>
-        </div>
-        <img id="satellite-image" src="" alt="Live Satellite Frame">
-    </div>
-
+    <div class="header">WPAC Regional Infrared Satellite Loop</div>
+    
     <div class="control-bar">
-        <button class="btn-play" id="btn-play" onclick="togglePlay()"><i class="fa-solid fa-pause"></i></button>
-        <div class="timeline-container">
-            <div class="timestamp" id="timestamp-display">Loading...</div>
-            <input type="range" class="slider" id="timeline-slider" min="0" max="11" value="0" oninput="manualSeek(this.value)">
-        </div>
+        <button id="btn-first">|&lt; First</button>
+        <button id="btn-prev">&lt; Prev</button>
+        <button id="btn-play">Play</button>
+        <button id="btn-stop">Stop</button>
+        <button id="btn-next">Next &gt;</button>
+        <button id="btn-last">Last &gt;|</button>
+        
+        <select id="speed-select">
+            <option value="1200">Slow</option>
+            <option value="600" selected>Normal</option>
+            <option value="200">Fast</option>
+        </select>
+    </div>
+
+    <div class="frame-counter" id="counter">
+        <span id="status-text">Connecting to JMA Satellite Network...</span>
+    </div>
+
+    <div class="image-container">
+        <img id="satellite-image" src="" alt="">
     </div>
 
     <script>
-        // =====================================================================
-        // THE JMA / NICT BULLETPROOF ENGINE
-        // This calculates the exact times for the last 12 Himawari image frames,
-        // pre-downloads them to prevent flashing, and silently throws away 
-        // any broken 404 links so you never see an error icon.
-        // =====================================================================
-        
         let validFrames = [];
-        let currentFrameIndex = 0;
-        let isPlaying = true;
-        let loopTimer = null;
-        
-        const imgElement = document.getElementById('satellite-image');
-        const slider = document.getElementById('timeline-slider');
-        const timeDisplay = document.getElementById('timestamp-display');
-        const playBtn = document.getElementById('btn-play');
-        const loadingScreen = document.getElementById('loading-screen');
-        const statusBadge = document.getElementById('status-badge');
+        let currentIndex = 0;
+        let timer = null;
+        let isPlaying = false;
 
+        const imgElement = document.getElementById('satellite-image');
+        const counterElement = document.getElementById('counter');
+        const speedSelect = document.getElementById('speed-select');
+        const playBtn = document.getElementById('btn-play');
+
+        // 1. Generate the precise URLs for the WPAC Tile (0_0)
         function generateTimestamps() {
             let urlsToLoad = [];
             let now = new Date();
             
-            // JMA Himawari images are delayed by ~30 mins for processing
-            now.setMinutes(now.getMinutes() - 30);
-            // Round down to the nearest 10-minute interval
+            // Offset by 35 minutes to ensure JMA has finished uploading the image
+            now.setMinutes(now.getMinutes() - 35);
             now.setMinutes(Math.floor(now.getMinutes() / 10) * 10);
             now.setSeconds(0);
 
-            // Get the last 12 frames (2 hours of footage)
-            for (let i = 11; i >= 0; i--) {
+            // Fetch the last 15 frames (2.5 hours of footage)
+            for (let i = 14; i >= 0; i--) {
                 let d = new Date(now.getTime() - (i * 10 * 60000));
                 
                 let yyyy = d.getUTCFullYear();
@@ -186,42 +164,36 @@
                 let hh = String(d.getUTCHours()).padStart(2, '0');
                 let min = String(d.getUTCMinutes()).padStart(2, '0');
 
-                // The official public NICT Himawari endpoint
-                let url = `https://himawari8-dl.nict.go.jp/himawari8/img/D531106/1d/550/${yyyy}/${mm}/${dd}/${hh}${min}00_0_0.png`;
+                // THE WPAC TRICK: 'INFRARED_FULL/2d/550' + tile '0_0'
+                let url = `https://himawari8-dl.nict.go.jp/himawari8/img/INFRARED_FULL/2d/550/${yyyy}/${mm}/${dd}/${hh}${min}00_0_0.png`;
                 
                 let localTime = d.toLocaleTimeString('en-US', { hour: '2-digit', minute:'2-digit' });
-                let localDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                let displayString = `${localDate} | ${localTime} PST`;
-
-                urlsToLoad.push({ url: url, time: displayString });
+                urlsToLoad.push({ url: url, label: `FRAME: ${15-i}/15 | ${localTime} PST` });
             }
             return urlsToLoad;
         }
 
+        // 2. Pre-fetch and cache the images
         function preloadImages() {
             let targets = generateTimestamps();
             let attempts = 0;
-            let expectedTotal = targets.length;
 
             targets.forEach(target => {
                 let img = new Image();
                 img.src = target.url;
                 
-                // IF SUCCESSFUL: Add to our playlist
                 img.onload = function() {
-                    validFrames.push({ url: target.url, time: target.time });
+                    validFrames.push(target);
                     checkIfDone();
                 };
                 
-                // IF BROKEN/404: Throw it away silently so the map never breaks
                 img.onerror = function() {
-                    expectedTotal--; 
-                    checkIfDone();
+                    checkIfDone(); // Ignore broken frames silently
                 };
                 
                 function checkIfDone() {
                     attempts++;
-                    // Sort them back into chronological order just in case they loaded out of order
+                    // Keep them in chronological order
                     validFrames.sort((a, b) => a.url.localeCompare(b.url));
                     
                     if (attempts === targets.length) {
@@ -231,64 +203,7 @@
             });
         }
 
+        // 3. Animation Engine
         function startDashboard() {
             if (validFrames.length === 0) {
-                timeDisplay.innerText = "Error: API Offline";
-                return;
-            }
-            
-            // Remove loading screen
-            loadingScreen.style.display = "none";
-            statusBadge.innerHTML = '<i class="fa-solid fa-circle-check"></i> LIVE SYNCED';
-            statusBadge.style.color = '#10b981';
-            statusBadge.style.borderColor = '#10b981';
-            
-            // Set slider max to however many valid images we found
-            slider.max = validFrames.length - 1;
-            slider.value = 0;
-            
-            showFrame(0);
-            startLoop();
-        }
-
-        function showFrame(index) {
-            currentFrameIndex = index;
-            imgElement.src = validFrames[index].url;
-            timeDisplay.innerText = validFrames[index].time;
-            slider.value = index;
-        }
-
-        function nextFrame() {
-            let next = currentFrameIndex + 1;
-            if (next >= validFrames.length) next = 0;
-            showFrame(next);
-        }
-
-        function startLoop() {
-            if (loopTimer) clearInterval(loopTimer);
-            loopTimer = setInterval(nextFrame, 800); // Clean 0.8s transition
-            playBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
-            isPlaying = true;
-        }
-
-        function stopLoop() {
-            if (loopTimer) clearInterval(loopTimer);
-            playBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
-            isPlaying = false;
-        }
-
-        function togglePlay() {
-            if (isPlaying) stopLoop();
-            else startLoop();
-        }
-
-        function manualSeek(val) {
-            stopLoop();
-            showFrame(parseInt(val));
-        }
-
-        // Start the engine
-        preloadImages();
-    </script>
-</body>
-</html>
+                counterElement.innerHTML = "<span style='color:#
