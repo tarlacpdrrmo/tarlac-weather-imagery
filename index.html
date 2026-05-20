@@ -88,18 +88,31 @@
             font-family: monospace; font-size: 14px; font-weight: 700; color: #94a3b8;
         }
 
-        /* --- Embed Container --- */
+        /* --- THE MAGIC PICTURE FRAME --- */
         .viewer-container {
             flex-grow: 1;
             width: 100%;
             position: relative;
             background: #000000;
+            overflow: hidden; /* This acts like the crop tool, hiding anything outside this box */
         }
 
-        iframe {
-            width: 100%;
-            height: 100%;
+        /* --- THE CSS CROP HACK --- */
+        .iframe-crop {
+            position: absolute;
+            
+            /* TWEAK THESE NUMBERS TO PERFECT THE CROP */
+            top: -110px;        /* Pushes their website UP to hide their top menu */
+            left: -15px;        /* Pushes their website LEFT to hide their side margins */
+            
+            /* Stretches the frame to fill the gaps created by pulling it up and left */
+            width: calc(100% + 30px);   
+            height: calc(100% + 150px); 
+            
             border: none;
+            
+            /* Optional: Allows you to zoom slightly if the map is too small */
+            /* transform: scale(1.1); */
         }
     </style>
 </head>
@@ -120,7 +133,7 @@
     </div>
 
     <div class="viewer-container">
-        <iframe src="https://cyclonicwx.com/floater/wpac/ir/" allowfullscreen></iframe>
+        <iframe class="iframe-crop" src="https://cyclonicwx.com/floater/wpac/ir/" scrolling="no"></iframe>
     </div>
 
     <script>
