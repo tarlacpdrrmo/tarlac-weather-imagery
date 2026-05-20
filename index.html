@@ -3,207 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WPAC Satellite Loop | Tarlac PDRRMO</title>
+    <title>WPAC Satellite Stream | Tarlac PDRRMO</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
     <style>
-        body { 
-            margin: 0; 
-            font-family: Arial, sans-serif; 
-            background: #000000; 
-            color: #ffffff; 
-            text-align: center; 
-            height: 100vh;
+        body, html { 
+            margin: 0; padding: 0; 
+            font-family: 'Inter', sans-serif; 
+            background-color: #020617; 
+            color: #f8fafc;
+            height: 100vh; width: 100vw;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
         }
-        
-        /* The Classic Orange Header */
-        .header { 
-            background: #d9534f; 
-            padding: 12px; 
-            font-weight: bold; 
-            font-size: 18px; 
-            border-bottom: 2px solid #ffffff; 
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        /* The Gray Control Bar */
-        .control-bar { 
-            background: #e0e0e0; 
-            padding: 10px; 
-            display: flex; 
-            justify-content: center; 
-            gap: 8px; 
-            flex-wrap: wrap; 
-            border-bottom: 1px solid #999;
-        }
-        
-        .control-bar button { 
-            padding: 6px 15px; 
-            font-size: 14px; 
-            cursor: pointer; 
-            border: 1px solid #999; 
-            background: #f8f8f8; 
-            color: #333; 
-            font-weight: bold; 
-            border-radius: 3px; 
-            transition: 0.1s;
-        }
-        
-        .control-bar button:hover { 
-            background: #d4d4d4; 
-            border-color: #666;
-        }
 
-        .control-bar button:active {
-            background: #bbb;
-        }
-        
-        .control-bar select { 
-            padding: 5px; 
-            font-size: 14px; 
-            font-weight: bold;
-            border: 1px solid #999;
-            border-radius: 3px;
-        }
-        
-        .frame-counter { 
-            font-size: 14px; 
-            color: #aaaaaa; 
-            margin: 15px 0; 
-            font-weight: bold;
-            font-family: monospace;
-            letter-spacing: 0.5px;
-        }
-
-        .image-container { 
-            flex-grow: 1;
-            padding: 0 20px 20px 20px;
+        /* --- Operational Top Bar --- */
+        .top-bar {
+            background: #0f172a;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+            padding: 14px 24px;
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            z-index: 50;
             position: relative;
         }
-        
-        #satellite-image { 
-            max-width: 100%; 
-            max-height: 75vh; 
-            border: 1px solid #333; 
-            box-shadow: 0 0 20px rgba(255,255,255,0.05);
-            /* Optional: Adds slight contrast to make clouds pop */
-            filter: contrast(1.1) brightness(1.05); 
+
+        .brand-container { display: flex; align-items: center; gap: 15px; }
+        .radar-icon { color: #38bdf8; font-size: 22px; animation: pulse-glowing 2s infinite ease-in-out; }
+        @keyframes pulse-glowing { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 10px #38bdf8; } 100% { transform: scale(1); opacity: 0.8; } }
+
+        .title-block h1 { margin: 0; font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #f1f5f9; }
+        .title-block p { margin: 0; font-size: 10px; color: #38bdf8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .status-block { display: flex; align-items: center; gap: 20px; }
+        .live-indicator { display: flex; align-items: center; gap: 8px; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.3); padding: 5px 14px; border-radius: 20px; font-size: 10px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px; }
+        .live-dot { width: 6px; height: 6px; background: #38bdf8; border-radius: 50%; box-shadow: 0 0 8px #38bdf8; animation: blink 1.5s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .clock { font-family: monospace; font-size: 14px; font-weight: 700; color: #94a3b8; }
+
+        /* --- THE CLIPPING MASK (The "Cardboard Cutout") --- */
+        .viewer-container {
+            flex-grow: 1;
+            width: 100%;
+            background: #020617;
+            position: relative;
+            
+            /* This hides any part of the iframe that bleeds outside this box */
+            overflow: hidden; 
         }
 
-        /* Status Indicator during load */
-        #status-text {
-            color: #d9534f;
-            animation: pulse 1s infinite;
+        /* --- THE IFRAME MANIPULATION --- */
+        .iframe-crop {
+            position: absolute;
+            
+            /* 1. HIDE THE TOP MENU: Pushes their website UP out of view */
+            top: -120px; 
+            
+            /* 2. HIDE THE SIDE MARGINS: Stretches the frame horizontally */
+            left: -20px;
+            width: calc(100% + 40px);
+            
+            /* 3. LEAVE THE CONTROLS: Ensures the height allows the image AND the timeline to show */
+            height: calc(100% + 150px);
+            
+            border: none;
         }
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+
+        /* Bottom blackout bar to cover any excess footer from their site below the timeline */
+        .bottom-mask {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 25px;
+            background: #020617;
+            z-index: 20;
         }
     </style>
 </head>
 <body>
 
-    <div class="header">WPAC Regional Infrared Satellite Loop</div>
-    
-    <div class="control-bar">
-        <button id="btn-first">|&lt; First</button>
-        <button id="btn-prev">&lt; Prev</button>
-        <button id="btn-play">Play</button>
-        <button id="btn-stop">Stop</button>
-        <button id="btn-next">Next &gt;</button>
-        <button id="btn-last">Last &gt;|</button>
+    <div class="top-bar">
+        <div class="brand-container">
+            <i class="fa-solid fa-satellite-dish radar-icon"></i>
+            <div class="title-block">
+                <h1>Tropical WPAC Infrared Stream</h1>
+                <p>Tarlac PDRRMO | CyclonicWX Node</p>
+            </div>
+        </div>
+        <div class="status-block">
+            <div class="live-indicator"><div class="live-dot"></div> Live Connection</div>
+            <div class="clock" id="live-clock">00:00:00</div>
+        </div>
+    </div>
+
+    <div class="viewer-container">
         
-        <select id="speed-select">
-            <option value="1200">Slow</option>
-            <option value="600" selected>Normal</option>
-            <option value="200">Fast</option>
-        </select>
-    </div>
+        <iframe class="iframe-crop" src="https://cyclonicwx.com/floater/nwpac/ir/" scrolling="no"></iframe>
+        
+        <div class="bottom-mask"></div>
 
-    <div class="frame-counter" id="counter">
-        <span id="status-text">Connecting to JMA Satellite Network...</span>
-    </div>
-
-    <div class="image-container">
-        <img id="satellite-image" src="" alt="">
     </div>
 
     <script>
-        let validFrames = [];
-        let currentIndex = 0;
-        let timer = null;
-        let isPlaying = false;
-
-        const imgElement = document.getElementById('satellite-image');
-        const counterElement = document.getElementById('counter');
-        const speedSelect = document.getElementById('speed-select');
-        const playBtn = document.getElementById('btn-play');
-
-        // 1. Generate the precise URLs for the WPAC Tile (0_0)
-        function generateTimestamps() {
-            let urlsToLoad = [];
-            let now = new Date();
-            
-            // Offset by 35 minutes to ensure JMA has finished uploading the image
-            now.setMinutes(now.getMinutes() - 35);
-            now.setMinutes(Math.floor(now.getMinutes() / 10) * 10);
-            now.setSeconds(0);
-
-            // Fetch the last 15 frames (2.5 hours of footage)
-            for (let i = 14; i >= 0; i--) {
-                let d = new Date(now.getTime() - (i * 10 * 60000));
-                
-                let yyyy = d.getUTCFullYear();
-                let mm = String(d.getUTCMonth() + 1).padStart(2, '0');
-                let dd = String(d.getUTCDate()).padStart(2, '0');
-                let hh = String(d.getUTCHours()).padStart(2, '0');
-                let min = String(d.getUTCMinutes()).padStart(2, '0');
-
-                // THE WPAC TRICK: 'INFRARED_FULL/2d/550' + tile '0_0'
-                let url = `https://himawari8-dl.nict.go.jp/himawari8/img/INFRARED_FULL/2d/550/${yyyy}/${mm}/${dd}/${hh}${min}00_0_0.png`;
-                
-                let localTime = d.toLocaleTimeString('en-US', { hour: '2-digit', minute:'2-digit' });
-                urlsToLoad.push({ url: url, label: `FRAME: ${15-i}/15 | ${localTime} PST` });
-            }
-            return urlsToLoad;
+        // System Clock
+        function updateOperationalClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { hour12: false });
+            const dateString = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+            document.getElementById('live-clock').innerText = `${dateString} | ${timeString} PST`;
         }
-
-        // 2. Pre-fetch and cache the images
-        function preloadImages() {
-            let targets = generateTimestamps();
-            let attempts = 0;
-
-            targets.forEach(target => {
-                let img = new Image();
-                img.src = target.url;
-                
-                img.onload = function() {
-                    validFrames.push(target);
-                    checkIfDone();
-                };
-                
-                img.onerror = function() {
-                    checkIfDone(); // Ignore broken frames silently
-                };
-                
-                function checkIfDone() {
-                    attempts++;
-                    // Keep them in chronological order
-                    validFrames.sort((a, b) => a.url.localeCompare(b.url));
-                    
-                    if (attempts === targets.length) {
-                        startDashboard();
-                    }
-                }
-            });
-        }
-
-        // 3. Animation Engine
-        function startDashboard() {
-            if (validFrames.length === 0) {
-                counterElement.innerHTML = "<span style='color:#
+        setInterval(updateOperationalClock, 1000);
+        updateOperationalClock();
+    </script>
+</body>
+</html>
