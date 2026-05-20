@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Satellite Loop Monitor | Tarlac PDRRMO</title>
+    <title>Infrared Satellite Loop | Tarlac PDRRMO</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,7 @@
         body, html { 
             margin: 0; padding: 0; 
             font-family: 'Inter', sans-serif; 
-            background-color: #090d16; 
+            background-color: #020617; 
             color: #f8fafc;
             height: 100vh; width: 100vw;
             overflow: hidden;
@@ -88,182 +88,18 @@
             font-family: monospace; font-size: 14px; font-weight: 700; color: #94a3b8;
         }
 
-        /* --- Main Content Area --- */
+        /* --- Embed Container --- */
         .viewer-container {
             flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            background: #020617;
-            padding: 20px;
-        }
-
-        .image-frame-wrapper {
-            max-width: 100%;
-            max-height: calc(100vh - 200px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            overflow: hidden;
-            background: #000;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #satellite-view {
-            display: block;
-            max-width: 100%;
-            max-height: calc(100vh - 200px);
-            object-fit: contain;
-        }
-
-        /* --- Loading State Display --- */
-        .loading-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(2, 6, 23, 0.9);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            z-index: 5;
-            transition: opacity 0.4s ease;
-        }
-        .spinner {
-            width: 40px; height: 40px;
-            border: 4px solid rgba(56, 189, 248, 0.1);
-            border-top-color: #38bdf8;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* --- Dashboard Control Console --- */
-        .control-console {
-            background: #0f172a;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 16px 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            z-index: 10;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
-        }
-
-        .timeline-row {
-            display: flex;
-            align-items: center;
-            gap: 15px;
             width: 100%;
+            position: relative;
+            background: #000000;
         }
 
-        .frame-counter {
-            font-family: monospace;
-            font-size: 12px;
-            color: #94a3b8;
-            min-width: 90px;
-            font-weight: 700;
-        }
-
-        .slider-timeline {
-            flex-grow: 1;
-            -webkit-appearance: none;
-            appearance: none;
-            height: 6px;
-            border-radius: 3px;
-            background: #1e293b;
-            outline: none;
-            cursor: pointer;
-        }
-        .slider-timeline::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 16px; height: 16px;
-            border-radius: 50%;
-            background: #38bdf8;
-            box-shadow: 0 0 8px #38bdf8;
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
-        .slider-timeline::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
-        }
-
-        .buttons-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        iframe {
             width: 100%;
-        }
-
-        .action-cluster {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .ctrl-btn {
-            background: #1e293b;
-            border: 1px solid rgba(255,255,255,0.05);
-            color: #cbd5e1;
-            width: 38px; height: 38px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-        .ctrl-btn:hover {
-            background: #334155;
-            color: #38bdf8;
-            border-color: rgba(56, 189, 248, 0.3);
-        }
-        .ctrl-btn.btn-main {
-            background: #38bdf8;
-            color: #0f172a;
-            width: 44px; height: 44px;
-            font-size: 16px;
-            border-radius: 50%;
-            box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
-        }
-        .ctrl-btn.btn-main:hover {
-            background: #7dd3fc;
-            color: #0f172a;
-            transform: scale(1.05);
-        }
-
-        .speed-box {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #1e293b;
-            padding: 6px 14px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.03);
-        }
-        .speed-box label {
-            font-size: 10px;
-            text-transform: uppercase;
-            font-weight: 700;
-            color: #64748b;
-            letter-spacing: 0.5px;
-        }
-        .speed-box select {
-            background: transparent;
+            height: 100%;
             border: none;
-            color: #f1f5f9;
-            font-family: 'Inter', sans-serif;
-            font-size: 12px;
-            font-weight: 700;
-            outline: none;
-            cursor: pointer;
         }
     </style>
 </head>
@@ -271,200 +107,23 @@
 
     <div class="top-bar">
         <div class="brand-container">
-            <i class="fa-solid fa-circle-notch radar-icon"></i>
+            <i class="fa-solid fa-satellite-dish radar-icon"></i>
             <div class="title-block">
-                <h1>Infrared Floater Animation Loop</h1>
-                <p>WPAC Regional Imagery Stream</p>
+                <h1>Western Pacific Infrared Loop</h1>
+                <p>CyclonicWX Satellite Stream</p>
             </div>
         </div>
         <div class="status-block">
-            <div class="live-indicator"><div class="live-dot"></div> Live Cache Enabled</div>
+            <div class="live-indicator"><div class="live-dot"></div> Live Stream Connected</div>
             <div class="clock" id="live-clock">00:00:00</div>
         </div>
     </div>
 
     <div class="viewer-container">
-        <div class="image-frame-wrapper">
-            <div class="loading-overlay" id="loadingOverlay">
-                <div class="spinner"></div>
-                <div style="font-size: 12px; font-weight: 700; color: #94a3b8; uppercase; letter-spacing: 1px;">Caching Frame Matrix...</div>
-            </div>
-            
-            <img id="satellite-view" alt="Loading Western Pacific Floater Stream...">
-        </div>
-    </div>
-
-    <div class="control-console">
-        <div class="timeline-row">
-            <div class="frame-counter" id="frameCounter">FRAME: 00 / 00</div>
-            <input type="range" class="slider-timeline" id="timelineSlider" min="0" max="23" value="0">
-        </div>
-
-        <div class="buttons-row">
-            <div class="action-cluster">
-                <button class="ctrl-btn" id="btnPrev" title="Previous Frame"><i class="fa-solid fa-backward-step"></i></button>
-                <button class="ctrl-btn btn-main" id="btnPlayPause" title="Play / Pause"><i class="fa-solid fa-play"></i></button>
-                <button class="ctrl-btn" id="btnNext" title="Next Frame"><i class="fa-solid fa-forward-step"></i></button>
-            </div>
-
-            <div class="action-cluster">
-                <div class="speed-box">
-                    <label>Speed:</label>
-                    <select id="speedSelect">
-                        <option value="500">0.5s / Frame</option>
-                        <option value="250" selected>0.25s / Frame</option>
-                        <option value="125">0.12s / Frame</option>
-                        <option value="70">Max Speed</option>
-                    </select>
-                </div>
-                <button class="ctrl-btn" id="btnRefresh" title="Refresh Live Cache Stack"><i class="fa-solid fa-rotate"></i></button>
-            </div>
-        </div>
+        <iframe src="https://cyclonicwx.com/floater/wpac/ir/" allowfullscreen></iframe>
     </div>
 
     <script>
-        // =========================================================================
-        // CYCLONICWX FLOATER DATA MATRIX INTEGRATION CONFIGURATION
-        // =========================================================================
-        const baseFolderUrl = "https://cyclonicwx.com/floater/wpac/ir/";
-        
-        // CyclonicWX maps standard sequential frames for the animation loop (0 to 23)
-        const totalFrames = 24; 
-        let frameUrls = [];
-        let cachedImages = [];
-        let currentFrameIndex = 0;
-        let isPlaying = true;
-        let playbackIntervalId = null;
-
-        const viewElement = document.getElementById('satellite-view');
-        const sliderElement = document.getElementById('timelineSlider');
-        const counterElement = document.getElementById('frameCounter');
-        const playPauseBtn = document.getElementById('btnPlayPause');
-        const loadingOverlay = document.getElementById('loadingOverlay');
-
-        // Generate URLs matching the exact directory file format structure (0.png to 23.png)
-        function generateFrameMatrixUrls() {
-            frameUrls = [];
-            for (let i = 0; i < totalFrames; i++) {
-                frameUrls.push(`${baseFolderUrl}${i}.png`);
-            }
-            sliderElement.max = totalFrames - 1;
-        }
-
-        // Preload and cache frames across the network stack to ensure zero stutter
-        function preloadFrameMatrix() {
-            loadingOverlay.style.opacity = '1';
-            loadingOverlay.style.display = 'flex';
-            let loadedCount = 0;
-            cachedImages = [];
-
-            frameUrls.forEach((url, index) => {
-                const img = new Image();
-                img.src = url;
-                img.onload = () => {
-                    loadedCount++;
-                    if (loadedCount === totalFrames) {
-                        // Fade out loading block instantly once cached
-                        loadingOverlay.style.opacity = '0';
-                        setTimeout(() => loadingOverlay.style.display = 'none', 400);
-                        if (isPlaying) startPlaybackEngine();
-                    }
-                };
-                img.onerror = () => {
-                    // Fallback configuration path handling gracefully
-                    loadedCount++;
-                    if (loadedCount === totalFrames) {
-                        loadingOverlay.style.opacity = '0';
-                        setTimeout(() => loadingOverlay.style.display = 'none', 400);
-                    }
-                };
-                cachedImages[index] = img;
-            });
-            
-            // Set initial starting viewpoint frame
-            viewElement.src = frameUrls[0];
-            updateDashboardCounters();
-        }
-
-        function updateDisplayFrame(index) {
-            if (index >= 0 && index < totalFrames) {
-                currentFrameIndex = index;
-                viewElement.src = frameUrls[currentFrameIndex];
-                sliderElement.value = currentFrameIndex;
-                updateDashboardCounters();
-            }
-        }
-
-        function updateDashboardCounters() {
-            const displayCurrent = String(currentFrameIndex + 1).padStart(2, '0');
-            const displayTotal = String(totalFrames).padStart(2, '0');
-            counterElement.innerText = `FRAME: ${displayCurrent} / ${displayTotal}`;
-        }
-
-        function startPlaybackEngine() {
-            stopPlaybackEngine();
-            const currentSpeed = parseInt(document.getElementById('speedSelect').value);
-            playbackIntervalId = setInterval(() => {
-                let nextFrame = currentFrameIndex + 1;
-                if (nextFrame >= totalFrames) nextFrame = 0;
-                updateDisplayFrame(nextFrame);
-            }, currentSpeed);
-        }
-
-        function stopPlaybackEngine() {
-            if (playbackIntervalId) {
-                clearInterval(playbackIntervalId);
-                playbackIntervalId = null;
-            }
-        }
-
-        // --- UI Controller Bindings ---
-        playPauseBtn.addEventListener('click', () => {
-            if (isPlaying) {
-                stopPlaybackEngine();
-                playPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
-                playPauseBtn.style.boxShadow = 'none';
-            } else {
-                startPlaybackEngine();
-                playPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
-                playPauseBtn.style.boxShadow = '0 0 12px rgba(56, 189, 248, 0.4)';
-            }
-            isPlaying = !isPlaying;
-        });
-
-        document.getElementById('btnNext').addEventListener('click', () => {
-            stopPlaybackEngine();
-            isPlaying = false;
-            playPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
-            let nextFrame = currentFrameIndex + 1;
-            if (nextFrame >= totalFrames) nextFrame = 0;
-            updateDisplayFrame(nextFrame);
-        });
-
-        document.getElementById('btnPrev').addEventListener('click', () => {
-            stopPlaybackEngine();
-            isPlaying = false;
-            playPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
-            let prevFrame = currentFrameIndex - 1;
-            if (prevFrame < 0) prevFrame = totalFrames - 1;
-            updateDisplayFrame(prevFrame);
-        });
-
-        sliderElement.addEventListener('input', (e) => {
-            stopPlaybackEngine();
-            isPlaying = false;
-            playPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
-            updateDisplayFrame(parseInt(e.target.value));
-        });
-
-        document.getElementById('speedSelect').addEventListener('change', () => {
-            if (isPlaying) startPlaybackEngine();
-        });
-
-        document.getElementById('btnRefresh').addEventListener('click', () => {
-            initializeDashboardEngine();
-        });
-
         // --- System Clock Implementation ---
         function updateOperationalClock() {
             const now = new Date();
@@ -473,17 +132,8 @@
             document.getElementById('live-clock').innerText = `${dateString} | ${timeString} PST`;
         }
 
-        function initializeDashboardEngine() {
-            generateFrameMatrixUrls();
-            preloadFrameMatrix();
-            // Default icon view initialize matching pause state
-            playPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
-        }
-
-        // Execution Hooks
         setInterval(updateOperationalClock, 1000);
         updateOperationalClock();
-        initializeDashboardEngine();
     </script>
 </body>
 </html>
