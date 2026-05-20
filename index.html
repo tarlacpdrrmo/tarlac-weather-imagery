@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typhoon Tracker | Tarlac PDRRMO</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        body, html { 
+            margin: 0; padding: 0; 
+            font-family: 'Inter', sans-serif; 
+            background-color: #020617; 
+            color: #f8fafc;
+            height: 100vh; width: 100vw;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* --- Sidebar (Left) --- */
+        .sidebar {
+            width: 350px;
+            background: #0f172a;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #38bdf8;
+            margin: 0 0 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        /* --- Live Feed Button --- */
+        .btn-live {
+            margin: 15px 20px 0 20px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10b981;
+            color: #10b981;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 12px;
+            text-transform: uppercase;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-live:hover {
+            background: #10b981;
+            color: #020617;
+        }
+
+        .live-dot {
+            width: 8px; height: 8px; background: currentColor;
+            border-radius: 50%; box-shadow: 0 0 8px currentColor;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+
+        /* --- Typhoon List --- */
+        .storm-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Custom Scrollbar for Sidebar */
+        .storm-list::-webkit-scrollbar { width: 6px; }
+        .storm-list::-webkit-scrollbar-track { background: #0f172a; }
+        .storm-list::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+        .storm-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 15px;
+            transition: all 0.2s;
+        }
+
+        .storm-card:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .storm-card.active {
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.05);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.1);
+        }
+
+        .storm-name {
+            font-size: 14px;
+            font-weight: 800;
+            color: #f8fafc;
+            margin: 0 0 4px 0;
+            text-transform: uppercase;
+        }
+
+        .storm-date {
+            font-size: 11px;
+            color: #94a3b8;
+            margin: 0 0 10px 0;
+            font-weight: 500;
+        }
+
+        .storm-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 10px;
+            margin-bottom: 12px;
+        }
+
+        .stat-box { display: flex; flex-direction: column; gap: 2px; }
+        .stat-label { font-size: 9px; color: #64748b; text-transform: uppercase; font-weight: 700; }
+        .stat-value { font-size: 12px; color: #cbd5e1; font-weight: 700; }
+        .stat-value.danger { color: #ef4444; }
+
+        .btn-view {
+            width: 100%;
+            background: transparent;
+            border: 1px solid rgba(56, 189, 248, 0.5);
+            color: #38bdf8;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-view:hover, .storm-card.active .btn-view {
+            background: #38bdf8;
+            color: #020617;
+        }
+
+        /* --- Main Content (Right) --- */
+        .main-view {
+            flex-grow: 1;
+            position: relative;
+            background: #000;
+        }
+
+        .view-header {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 30px;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .view-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #f8fafc;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2 class="sidebar-title"><i class="fa-solid fa-hurricane"></i> Typhoon Tracker</h2>
+            <p class="sidebar-subtitle">Historical & Live Monitoring</p>
+        </div>
+
+        <div class="btn-live" onclick="loadFeed('live', this)">
+            <div class="live-dot"></div> Live Satellite Feed
+        </div>
+
+        <div class="storm-list" id="stormList">
+            </div>
+    </div>
+
+    <div class="main-view">
+        <div class="view-header">
+            <div class="live-dot" id="header-dot" style="background: #10b981; box-shadow: 0 0 8px #10b981;"></div>
+            <span class="view-title" id="currentViewTitle">Live Satellite Feed</span>
+        </div>
+
+        <iframe id="weatherFrame" src="https://zoom.earth/maps/satellite/#view=15.48,120.59,6z" allowfullscreen></iframe>
+    </div>
+
+    <script>
+        // Database of Historical Storms
+        // Using Zoom Earth's historical archive URLs
+        const storms = [
+            { id: 'carina', name: 'Carina (Gaemi)', date: 'July 2024', winds: '230 km/h', pressure: '940 hPa', url: 'https://zoom.earth/storms/gaemi-2024/' },
+            { id: 'egay', name: 'Egay (Doksuri)', date: 'July 2023', winds: '240 km/h', pressure: '925 hPa', url: 'https://zoom.earth/storms/doksuri-2023/' },
+            { id: 'karding', name: 'Karding (Noru)', date: 'September 2022', winds: '260 km/h', pressure: '940 hPa', url: 'https://zoom.earth/storms/noru-2022/' },
+            { id: 'paeng', name: 'Paeng (Nalgae)', date: 'October 2022', winds: '130 km/h', pressure: '975 hPa', url: 'https://zoom.earth/storms/nalgae-2022/' },
+            { id: 'ulysses', name: 'Ulysses (Vamco)', date: 'November 2020', winds: '215 km/h', pressure: '955 hPa', url: 'https://zoom.earth/storms/vamco-2020/' },
+            { id: 'ompong', name: 'Ompong (Mangkhut)', date: 'September 2018', winds: '285 km/h', pressure: '905 hPa', url: 'https://zoom.earth/storms/mangkhut-2018/' },
+            { id: 'lawin', name: 'Lawin (Haima)', date: 'October 2016', winds: '270 km/h', pressure: '900 hPa', url: 'https://zoom.earth/storms/haima-2016/' }
+        ];
+
+        const defaultLiveUrl = "https://zoom.earth/maps/satellite/#view=15.48,120.59,6z";
+
+        // Generate the Sidebar Cards
+        const stormListContainer = document.getElementById('stormList');
+        
+        storms.forEach(storm => {
+            const card = document.createElement('div');
+            card.className = 'storm-card';
+            card.id = `card-${storm.id}`;
+            
+            card.innerHTML = `
+                <h3 class="storm-name">TYPHOON ${storm.name}</h3>
+                <p class="storm-date">${storm.date}</p>
+                <div class="storm-stats">
+                    <div class="stat-box">
+                        <span class="stat-label">Max Winds</span>
+                        <span class="stat-value danger">${storm.winds}</span>
+                    </div>
+                    <div class="stat-box" style="text-align: right;">
+                        <span class="stat-label">Pressure</span>
+                        <span class="stat-value">${storm.pressure}</span>
+                    </div>
+                </div>
+                <button class="btn-view" onclick="loadFeed('${storm.id}', this)">View Track</button>
+            `;
+            stormListContainer.appendChild(card);
+        });
+
+        // Function to switch the iframe and update the UI
+        function loadFeed(stormId, buttonElement) {
+            const iframe = document.getElementById('weatherFrame');
+            const title = document.getElementById('currentViewTitle');
+            const headerDot = document.getElementById('header-dot');
+
+            // Remove active class from all cards
+            document.querySelectorAll('.storm-card').forEach(c => c.classList.remove('active'));
+
+            if (stormId === 'live') {
+                iframe.src = defaultLiveUrl;
+                title.innerText = "Live Satellite Feed";
+                headerDot.style.background = "#10b981";
+                headerDot.style.boxShadow = "0 0 8px #10b981";
+                headerDot.style.display = "block";
+            } else {
+                const selectedStorm = storms.find(s => s.id === stormId);
+                if (selectedStorm) {
+                    iframe.src = selectedStorm.url;
+                    title.innerText = `Historical Track: ${selectedStorm.name}`;
+                    
+                    // Highlight the selected card
+                    const activeCard = document.getElementById(`card-${stormId}`);
+                    if (activeCard) activeCard.classList.add('active');
+
+                    // Change header dot to historical color (orange)
+                    headerDot.style.background = "#f97316";
+                    headerDot.style.boxShadow = "0 0 8px #f97316";
+                    headerDot.style.display = "none"; // Hide pulsing dot for history
+                }
+            }
+        }
+    </script>
+</body>
+</html>
