@@ -48,45 +48,42 @@
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         .clock { font-family: monospace; font-size: 14px; font-weight: 700; color: #94a3b8; }
 
-        /* --- THE CLIPPING CONTAINER --- */
+        /* --- THE CLIPPING MASK (The "Cardboard Cutout") --- */
         .viewer-container {
             flex-grow: 1;
             width: 100%;
             background: #020617;
             position: relative;
-            /* Anything pushed outside this box instantly becomes invisible */
+            
+            /* This hides any part of the iframe that bleeds outside this box */
             overflow: hidden; 
         }
 
-        /* --- 1. THE TOP CROP (Hides the Header) --- */
+        /* --- THE IFRAME MANIPULATION --- */
         .iframe-crop {
             position: absolute;
             
-            /* PULL THIS NUMBER MORE NEGATIVE to hide more of their top menu */
-            top: -135px; 
+            /* 1. HIDE THE TOP MENU: Pushes their website UP out of view */
+            top: -120px; 
             
-            /* Hides left and right margins */
-            left: -15px;
-            width: calc(100% + 30px);
+            /* 2. HIDE THE SIDE MARGINS: Stretches the frame horizontally */
+            left: -20px;
+            width: calc(100% + 40px);
             
-            /* Ensures the timeline makes it onto the screen */
-            height: calc(100% + 180px); 
+            /* 3. LEAVE THE CONTROLS: Ensures the height allows the image AND the timeline to show */
+            height: calc(100% + 150px);
             
             border: none;
         }
 
-        /* --- 2. THE BOTTOM MASK (Hides the Text) --- */
-        .bottom-blackout {
+        /* Bottom blackout bar to cover any excess footer from their site below the timeline */
+        .bottom-mask {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            
-            /* INCREASE THIS HEIGHT to cover up more of their text below the timeline */
-            height: 45px; 
-            
-            /* Matches the PDRRMO dashboard background exactly */
-            background: #020617; 
+            height: 25px;
+            background: #020617;
             z-index: 20;
         }
     </style>
@@ -98,11 +95,11 @@
             <i class="fa-solid fa-satellite-dish radar-icon"></i>
             <div class="title-block">
                 <h1>Tropical WPAC Infrared Stream</h1>
-                <p>Tarlac PDRRMO | Live Satellite Node</p>
+                <p>Tarlac PDRRMO | CyclonicWX Node</p>
             </div>
         </div>
         <div class="status-block">
-            <div class="live-indicator"><div class="live-dot"></div> FEED SECURED</div>
+            <div class="live-indicator"><div class="live-dot"></div> Live Connection</div>
             <div class="clock" id="live-clock">00:00:00</div>
         </div>
     </div>
@@ -111,7 +108,7 @@
         
         <iframe class="iframe-crop" src="https://cyclonicwx.com/floater/nwpac/ir/" scrolling="no"></iframe>
         
-        <div class="bottom-blackout"></div>
+        <div class="bottom-mask"></div>
 
     </div>
 
