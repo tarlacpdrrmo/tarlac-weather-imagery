@@ -14,106 +14,32 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
-        body, html { 
-            margin: 0; padding: 0; 
-            font-family: 'Inter', sans-serif; 
-            background-color: #020617; 
-            color: #f8fafc;
-            height: 100vh; width: 100vw;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* --- Operational Top Bar --- */
-        .top-bar {
-            background: #0f172a;
-            border-bottom: 1px solid rgba(16, 185, 129, 0.2);
-            padding: 14px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
-            z-index: 1000;
-        }
-
+        body, html { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background-color: #020617; color: #f8fafc; height: 100vh; width: 100vw; overflow: hidden; display: flex; flex-direction: column; }
+        
+        .top-bar { background: #0f172a; border-bottom: 1px solid rgba(16, 185, 129, 0.2); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0,0,0,0.6); z-index: 1000; }
         .brand-container { display: flex; align-items: center; gap: 15px; }
         .radar-icon { color: #10b981; font-size: 22px; animation: pulse-glowing 2s infinite ease-in-out; }
-        
-        @keyframes pulse-glowing { 
-            0% { transform: scale(1); opacity: 0.8; } 
-            50% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 10px #10b981; } 
-            100% { transform: scale(1); opacity: 0.8; } 
-        }
-
+        @keyframes pulse-glowing { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 10px #10b981; } 100% { transform: scale(1); opacity: 0.8; } }
         .title-block h1 { margin: 0; font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #f1f5f9; }
         .title-block p { margin: 0; font-size: 10px; color: #10b981; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-
         .status-block { display: flex; align-items: center; gap: 20px; }
-        .live-indicator { 
-            display: flex; align-items: center; gap: 8px; 
-            background: rgba(16, 185, 129, 0.1); 
-            border: 1px solid rgba(16, 185, 129, 0.3); 
-            padding: 5px 14px; border-radius: 20px; 
-            font-size: 10px; font-weight: 800; color: #10b981; 
-            text-transform: uppercase; letter-spacing: 0.5px; 
-        }
-
-        /* --- Map Container --- */
-        #map {
-            flex-grow: 1;
-            width: 100%;
-            background: #020617;
-            z-index: 1;
-        }
-
-        /* --- THE MAGIC SMOOTHING HACK --- */
-        /* This forces Leaflet to crossfade the radar layers instead of blinking */
-        .leaflet-layer {
-            transition: opacity 0.5s ease-in-out !important;
-        }
-
-        /* Hide Leaflet Attribution for a cleaner operational look */
+        
+        /* The Loading Indicator */
+        .live-indicator { display: flex; align-items: center; gap: 8px; background: rgba(245, 158, 11, 0.1); border: 1px solid #f59e0b; padding: 5px 14px; border-radius: 20px; font-size: 10px; font-weight: 800; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.3s ease; }
+        .live-indicator.ready { background: rgba(16, 185, 129, 0.1); border-color: #10b981; color: #10b981; }
+        
+        #map { flex-grow: 1; width: 100%; background: #020617; z-index: 1; }
+        .leaflet-layer { transition: opacity 0.5s ease-in-out !important; }
         .leaflet-control-attribution { display: none !important; }
 
-        /* --- Floating Control Console --- */
-        .radar-controls {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 15px 25px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            z-index: 1000;
-            width: 90%;
-            max-width: 600px;
-        }
-
-        .btn-play {
-            background: #10b981; color: #0f172a; width: 45px; height: 45px; border-radius: 50%; 
-            font-size: 16px; border: none; font-weight: 900; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); 
-            cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center;
-            flex-shrink: 0;
-        }
-        .btn-play:hover { background: #34d399; transform: scale(1.05); }
-
+        .radar-controls { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 15px 25px; border-radius: 12px; display: flex; align-items: center; gap: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 1000; width: 90%; max-width: 600px; }
+        .btn-play { background: #10b981; color: #0f172a; width: 45px; height: 45px; border-radius: 50%; font-size: 16px; border: none; font-weight: 900; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; flex-shrink: 0; }
+        .btn-play:disabled { background: #475569; box-shadow: none; cursor: not-allowed; opacity: 0.5; }
+        
         .timeline-container { flex-grow: 1; display: flex; flex-direction: column; gap: 8px; }
-        
         .timestamp-display { font-family: monospace; font-size: 14px; font-weight: 800; color: #f8fafc; text-align: center; letter-spacing: 1px; }
-        
-        .timeline-slider {
-            -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 3px; background: #1e293b; outline: none; cursor: pointer;
-        }
-        .timeline-slider::-webkit-slider-thumb {
-            -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981; cursor: pointer;
-        }
+        .timeline-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 3px; background: #1e293b; outline: none; cursor: pointer; }
+        .timeline-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -127,39 +53,33 @@
             </div>
         </div>
         <div class="status-block">
-            <div class="live-indicator">LIVE FEED</div>
+            <div class="live-indicator" id="status-badge"><i class="fa-solid fa-spinner fa-spin"></i> PRE-FETCHING DATA</div>
         </div>
     </div>
 
     <div id="map"></div>
 
     <div class="radar-controls">
-        <button class="btn-play" id="playBtn" onclick="togglePlay()"><i class="fa-solid fa-pause"></i></button>
+        <button class="btn-play" id="playBtn" onclick="togglePlay()" disabled><i class="fa-solid fa-play"></i></button>
         <div class="timeline-container">
-            <div class="timestamp-display" id="timestamp">Syncing Satellite Data...</div>
-            <input type="range" class="timeline-slider" id="slider" min="0" max="10" value="0" oninput="manualSeek(this.value)">
+            <div class="timestamp-display" id="timestamp">Connecting to RainViewer API...</div>
+            <input type="range" class="timeline-slider" id="slider" min="0" max="10" value="0" oninput="manualSeek(this.value)" disabled>
         </div>
     </div>
 
     <script>
-        // 1. Initialize Leaflet Map
         const map = L.map('map', { zoomControl: false }).setView([15.48, 120.59], 6);
         L.control.zoom({ position: 'topright' }).addTo(map);
 
-        // 2. Add Dark Basemap
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            maxZoom: 19
-        }).addTo(map);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
 
-        // --- THE ERROR FIX: A completely transparent 1x1 pixel image ---
-        // When RainViewer 404s on an empty ocean tile, Leaflet loads this invisible pixel instead of a broken icon.
         const emptyTileDataURI = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
 
         let radarLayers = [];
         let timestamps = [];
         let currentFrame = 0;
         let animationTimer = null;
-        let isPlaying = true;
+        let isPlaying = false; // Start paused while downloading
 
         async function fetchRadarData() {
             try {
@@ -171,28 +91,45 @@
 
                 document.getElementById('slider').max = timestamps.length - 1;
 
+                // --- PRE-FETCHING LOGIC ---
+                // We add the layers to the map, but force them to load immediately 
+                // in the background before we start animating.
                 timestamps.forEach((frame, index) => {
                     const layer = L.tileLayer(`${apiBaseUrl}${frame.path}/256/{z}/{x}/{y}/2/1_1.png`, {
                         opacity: 0, 
                         zIndex: 100 + index,
-                        errorTileUrl: emptyTileDataURI // <--- THIS KILLS THE BROKEN ICONS
+                        errorTileUrl: emptyTileDataURI,
+                        updateWhenIdle: false, // Force loading immediately
+                        updateWhenZooming: false
                     }).addTo(map);
                     
                     radarLayers.push(layer);
                 });
 
-                startAnimation();
+                // Wait 3 seconds to ensure the browser has actually downloaded all the tiles
+                // before we let the user click play. This prevents the 429 error.
+                setTimeout(() => {
+                    document.getElementById('status-badge').innerHTML = "LIVE FEED READY";
+                    document.getElementById('status-badge').classList.add('ready');
+                    document.getElementById('playBtn').disabled = false;
+                    document.getElementById('slider').disabled = false;
+                    
+                    // Show the first frame
+                    showFrame(0);
+                    
+                    // Auto-start the animation
+                    startAnimation();
+                }, 3000);
 
             } catch (error) {
                 console.error("Failed to load radar data:", error);
                 document.getElementById('timestamp').innerText = "Data Sync Failed";
+                document.getElementById('status-badge').innerHTML = "CONNECTION ERROR";
             }
         }
 
         function showFrame(index) {
             radarLayers.forEach(layer => layer.setOpacity(0));
-            
-            // Set opacity to 0.85 so you can see the cities underneath the rain
             radarLayers[index].setOpacity(0.85);
             
             const date = new Date(timestamps[index].time * 1000);
@@ -212,8 +149,7 @@
 
         function startAnimation() {
             if (animationTimer) clearInterval(animationTimer);
-            // --- THE SPEED FIX: Changed from 600ms to 1200ms (1.2 seconds per frame) ---
-            animationTimer = setInterval(nextFrame, 1200); 
+            animationTimer = setInterval(nextFrame, 1500); // 1.5 seconds per frame for smooth crossfading
             document.getElementById('playBtn').innerHTML = '<i class="fa-solid fa-pause"></i>';
             isPlaying = true;
         }
@@ -233,6 +169,7 @@
             showFrame(parseInt(value));
         }
 
+        // Initialize everything on load
         fetchRadarData();
     </script>
 </body>
