@@ -48,7 +48,7 @@
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         .clock { font-family: monospace; font-size: 14px; font-weight: 700; color: #94a3b8; }
 
-        /* --- THE CLIPPING MASK --- */
+        /* --- THE CLIPPING CONTAINER --- */
         .viewer-container {
             flex-grow: 1;
             width: 100%;
@@ -60,19 +60,68 @@
         /* --- THE IFRAME MANIPULATION --- */
         .iframe-crop {
             position: absolute;
+            
+            /* 1. TOP CROP: Pushes their top header up out of view */
             top: -120px; 
-            left: -20px;
-            width: calc(100% + 40px);
+            
+            /* 2. HEAVY LEFT CROP: Shoves the entire left settings menu off the screen */
+            left: -320px;
+            
+            /* 3. WIDTH ADJUSTMENT: Stretches the frame to fill the massive gap we just made */
+            width: calc(100% + 340px);
+            
+            /* 4. HEIGHT: Ensures the green timeline stays in the viewport */
             height: calc(100% + 150px);
+            
             border: none;
         }
 
-        /* --- THE FIX: Taller Bottom Blackout Bar --- */
+        /* --- THE BOTTOM CENSOR BAR --- */
         .bottom-mask {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            /* Increased from 25px to 50px to swallow the footer text */
-            height: 50px; 
-            background: #020617
+            height: 50px; /* Swallows the website text beneath the timeline */
+            background: #020617;
+            z-index: 20;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <div class="brand-container">
+            <i class="fa-solid fa-satellite-dish radar-icon"></i>
+            <div class="title-block">
+                <h1>Tropical WPAC Infrared Stream</h1>
+                <p>Tarlac PDRRMO | Live Satellite Node</p>
+            </div>
+        </div>
+        <div class="status-block">
+            <div class="live-indicator"><div class="live-dot"></div> FEED SECURED</div>
+            <div class="clock" id="live-clock">00:00:00</div>
+        </div>
+    </div>
+
+    <div class="viewer-container">
+        
+        <iframe class="iframe-crop" src="https://cyclonicwx.com/floater/nwpac/ir/" scrolling="no"></iframe>
+        
+        <div class="bottom-mask"></div>
+
+    </div>
+
+    <script>
+        // System Clock
+        function updateOperationalClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { hour12: false });
+            const dateString = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+            document.getElementById('live-clock').innerText = `${dateString} | ${timeString} PST`;
+        }
+        setInterval(updateOperationalClock, 1000);
+        updateOperationalClock();
+    </script>
+</body>
+</html>
