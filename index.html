@@ -3,312 +3,487 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typhoon Tracker | Tarlac PDRRMO</title>
+    <title>Satellite Loop Monitor | Tarlac PDRRMO</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <style>
         body, html { 
             margin: 0; padding: 0; 
             font-family: 'Inter', sans-serif; 
-            background-color: #020617; 
+            background-color: #090d16; 
             color: #f8fafc;
             height: 100vh; width: 100vw;
             overflow: hidden;
             display: flex;
+            flex-direction: column;
         }
 
-        /* --- Sidebar (Left) --- */
-        .sidebar {
-            width: 350px;
+        /* --- Operational Top Bar --- */
+        .top-bar {
             background: #0f172a;
-            border-right: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            flex-direction: column;
-            z-index: 10;
-            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
-        }
-
-        .sidebar-header {
-            padding: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.2);
-        }
-
-        .sidebar-title {
-            font-size: 16px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #38bdf8;
-            margin: 0 0 5px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .sidebar-subtitle {
-            font-size: 11px;
-            color: #94a3b8;
-            font-weight: 600;
-            text-transform: uppercase;
-            margin: 0;
-        }
-
-        /* --- Live Feed Button --- */
-        .btn-live {
-            margin: 15px 20px 0 20px;
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid #10b981;
-            color: #10b981;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: 800;
-            font-size: 12px;
-            text-transform: uppercase;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-live:hover {
-            background: #10b981;
-            color: #020617;
-        }
-
-        .live-dot {
-            width: 8px; height: 8px; background: currentColor;
-            border-radius: 50%; box-shadow: 0 0 8px currentColor;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
-
-        /* --- Typhoon List --- */
-        .storm-list {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 15px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        /* Custom Scrollbar for Sidebar */
-        .storm-list::-webkit-scrollbar { width: 6px; }
-        .storm-list::-webkit-scrollbar-track { background: #0f172a; }
-        .storm-list::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-
-        .storm-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 10px;
-            padding: 15px;
-            transition: all 0.2s;
-        }
-
-        .storm-card:hover {
-            background: rgba(255,255,255,0.08);
-            border-color: rgba(255,255,255,0.2);
-        }
-
-        .storm-card.active {
-            border-color: #38bdf8;
-            background: rgba(56, 189, 248, 0.05);
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.1);
-        }
-
-        .storm-name {
-            font-size: 14px;
-            font-weight: 800;
-            color: #f8fafc;
-            margin: 0 0 4px 0;
-            text-transform: uppercase;
-        }
-
-        .storm-date {
-            font-size: 11px;
-            color: #94a3b8;
-            margin: 0 0 10px 0;
-            font-weight: 500;
-        }
-
-        .storm-stats {
+            border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+            padding: 14px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            padding-top: 10px;
-            margin-bottom: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            z-index: 10;
         }
 
-        .stat-box { display: flex; flex-direction: column; gap: 2px; }
-        .stat-label { font-size: 9px; color: #64748b; text-transform: uppercase; font-weight: 700; }
-        .stat-value { font-size: 12px; color: #cbd5e1; font-weight: 700; }
-        .stat-value.danger { color: #ef4444; }
-
-        .btn-view {
-            width: 100%;
-            background: transparent;
-            border: 1px solid rgba(56, 189, 248, 0.5);
-            color: #38bdf8;
-            padding: 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 800;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-view:hover, .storm-card.active .btn-view {
-            background: #38bdf8;
-            color: #020617;
-        }
-
-        /* --- Main Content (Right) --- */
-        .main-view {
-            flex-grow: 1;
-            position: relative;
-            background: #000;
-        }
-
-        .view-header {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 10px 20px;
-            border-radius: 30px;
-            z-index: 20;
+        .brand-container {
             display: flex;
             align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            gap: 15px;
         }
 
-        .view-title {
-            font-size: 12px;
-            font-weight: 800;
-            color: #f8fafc;
+        .radar-icon {
+            color: #38bdf8;
+            font-size: 22px;
+            animation: pulse-glowing 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse-glowing {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 10px #38bdf8; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        .title-block h1 {
+            margin: 0; font-size: 15px; font-weight: 900; 
+            text-transform: uppercase; letter-spacing: 1px;
+            color: #f1f5f9;
+        }
+        .title-block p {
+            margin: 0; font-size: 10px; color: #38bdf8; 
+            font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        .status-block {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .live-indicator {
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(56, 189, 248, 0.08);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            padding: 5px 14px; border-radius: 20px;
+            font-size: 10px; font-weight: 800; color: #38bdf8;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
+        .live-dot {
+            width: 6px; height: 6px; background: #38bdf8;
+            border-radius: 50%; box-shadow: 0 0 8px #38bdf8;
+            animation: blink 1.5s infinite;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+        .clock {
+            font-family: monospace; font-size: 14px; font-weight: 700; color: #94a3b8;
         }
 
+        /* --- Main Content Area --- */
+        .viewer-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: #020617;
+            padding: 20px;
+        }
+
+        .image-frame-wrapper {
+            max-width: 100%;
+            max-height: calc(100vh - 200px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #satellite-view {
+            display: block;
+            max-width: 100%;
+            max-height: calc(100vh - 200px);
+            object-fit: contain;
+        }
+
+        /* --- Loading State Display --- */
+        .loading-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(2, 6, 23, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            z-index: 5;
+            transition: opacity 0.4s ease;
+        }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 4px solid rgba(56, 189, 248, 0.1);
+            border-top-color: #38bdf8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* --- Dashboard Control Console --- */
+        .control-console {
+            background: #0f172a;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 16px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 10;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
+        }
+
+        .timeline-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .frame-counter {
+            font-family: monospace;
+            font-size: 12px;
+            color: #94a3b8;
+            min-width: 90px;
+            font-weight: 700;
+        }
+
+        .slider-timeline {
+            flex-grow: 1;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #1e293b;
+            outline: none;
+            cursor: pointer;
+        }
+        .slider-timeline::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: #38bdf8;
+            box-shadow: 0 0 8px #38bdf8;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .slider-timeline::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .buttons-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .action-cluster {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ctrl-btn {
+            background: #1e293b;
+            border: 1px solid rgba(255,255,255,0.05);
+            color: #cbd5e1;
+            width: 38px; height: 38px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .ctrl-btn:hover {
+            background: #334155;
+            color: #38bdf8;
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+        .ctrl-btn.btn-main {
+            background: #38bdf8;
+            color: #0f172a;
+            width: 44px; height: 44px;
+            font-size: 16px;
+            border-radius: 50%;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+        }
+        .ctrl-btn.btn-main:hover {
+            background: #7dd3fc;
+            color: #0f172a;
+            transform: scale(1.05);
+        }
+
+        .speed-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #1e293b;
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+        .speed-box label {
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #64748b;
+            letter-spacing: 0.5px;
+        }
+        .speed-box select {
+            background: transparent;
+            border: none;
+            color: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            outline: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h2 class="sidebar-title"><i class="fa-solid fa-hurricane"></i> Typhoon Tracker</h2>
-            <p class="sidebar-subtitle">Historical & Live Monitoring</p>
-        </div>
-
-        <div class="btn-live" onclick="loadFeed('live', this)">
-            <div class="live-dot"></div> Live Satellite Feed
-        </div>
-
-        <div class="storm-list" id="stormList">
+    <div class="top-bar">
+        <div class="brand-container">
+            <i class="fa-solid fa-circle-notch radar-icon"></i>
+            <div class="title-block">
+                <h1>Infrared Floater Animation Loop</h1>
+                <p>WPAC Regional Imagery Stream</p>
             </div>
+        </div>
+        <div class="status-block">
+            <div class="live-indicator"><div class="live-dot"></div> Live Cache Enabled</div>
+            <div class="clock" id="live-clock">00:00:00</div>
+        </div>
     </div>
 
-    <div class="main-view">
-        <div class="view-header">
-            <div class="live-dot" id="header-dot" style="background: #10b981; box-shadow: 0 0 8px #10b981;"></div>
-            <span class="view-title" id="currentViewTitle">Live Satellite Feed</span>
+    <div class="viewer-container">
+        <div class="image-frame-wrapper">
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="spinner"></div>
+                <div style="font-size: 12px; font-weight: 700; color: #94a3b8; uppercase; letter-spacing: 1px;">Caching Frame Matrix...</div>
+            </div>
+            
+            <img id="satellite-view" alt="Loading Western Pacific Floater Stream...">
+        </div>
+    </div>
+
+    <div class="control-console">
+        <div class="timeline-row">
+            <div class="frame-counter" id="frameCounter">FRAME: 00 / 00</div>
+            <input type="range" class="slider-timeline" id="timelineSlider" min="0" max="23" value="0">
         </div>
 
-        <iframe id="weatherFrame" src="https://cyclonicwx.com/floater/wpac/ir/" allowfullscreen></iframe>
+        <div class="buttons-row">
+            <div class="action-cluster">
+                <button class="ctrl-btn" id="btnPrev" title="Previous Frame"><i class="fa-solid fa-backward-step"></i></button>
+                <button class="ctrl-btn btn-main" id="btnPlayPause" title="Play / Pause"><i class="fa-solid fa-play"></i></button>
+                <button class="ctrl-btn" id="btnNext" title="Next Frame"><i class="fa-solid fa-forward-step"></i></button>
+            </div>
+
+            <div class="action-cluster">
+                <div class="speed-box">
+                    <label>Speed:</label>
+                    <select id="speedSelect">
+                        <option value="500">0.5s / Frame</option>
+                        <option value="250" selected>0.25s / Frame</option>
+                        <option value="125">0.12s / Frame</option>
+                        <option value="70">Max Speed</option>
+                    </select>
+                </div>
+                <button class="ctrl-btn" id="btnRefresh" title="Refresh Live Cache Stack"><i class="fa-solid fa-rotate"></i></button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Database of Historical Storms
-        // Using Zoom Earth's historical archive URLs
-        const storms = [
-            { id: 'carina', name: 'Carina (Gaemi)', date: 'July 2024', winds: '230 km/h', pressure: '940 hPa', url: 'https://zoom.earth/storms/gaemi-2024/' },
-            { id: 'egay', name: 'Egay (Doksuri)', date: 'July 2023', winds: '240 km/h', pressure: '925 hPa', url: 'https://zoom.earth/storms/doksuri-2023/' },
-            { id: 'karding', name: 'Karding (Noru)', date: 'September 2022', winds: '260 km/h', pressure: '940 hPa', url: 'https://zoom.earth/storms/noru-2022/' },
-            { id: 'paeng', name: 'Paeng (Nalgae)', date: 'October 2022', winds: '130 km/h', pressure: '975 hPa', url: 'https://zoom.earth/storms/nalgae-2022/' },
-            { id: 'ulysses', name: 'Ulysses (Vamco)', date: 'November 2020', winds: '215 km/h', pressure: '955 hPa', url: 'https://zoom.earth/storms/vamco-2020/' },
-            { id: 'ompong', name: 'Ompong (Mangkhut)', date: 'September 2018', winds: '285 km/h', pressure: '905 hPa', url: 'https://zoom.earth/storms/mangkhut-2018/' },
-            { id: 'lawin', name: 'Lawin (Haima)', date: 'October 2016', winds: '270 km/h', pressure: '900 hPa', url: 'https://zoom.earth/storms/haima-2016/' }
-        ];
-
-        const defaultLiveUrl = "https://zoom.earth/maps/satellite/#view=15.48,120.59,6z";
-
-        // Generate the Sidebar Cards
-        const stormListContainer = document.getElementById('stormList');
+        // =========================================================================
+        // CYCLONICWX FLOATER DATA MATRIX INTEGRATION CONFIGURATION
+        // =========================================================================
+        const baseFolderUrl = "https://cyclonicwx.com/floater/wpac/ir/";
         
-        storms.forEach(storm => {
-            const card = document.createElement('div');
-            card.className = 'storm-card';
-            card.id = `card-${storm.id}`;
+        // CyclonicWX maps standard sequential frames for the animation loop (0 to 23)
+        const totalFrames = 24; 
+        let frameUrls = [];
+        let cachedImages = [];
+        let currentFrameIndex = 0;
+        let isPlaying = true;
+        let playbackIntervalId = null;
+
+        const viewElement = document.getElementById('satellite-view');
+        const sliderElement = document.getElementById('timelineSlider');
+        const counterElement = document.getElementById('frameCounter');
+        const playPauseBtn = document.getElementById('btnPlayPause');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        // Generate URLs matching the exact directory file format structure (0.png to 23.png)
+        function generateFrameMatrixUrls() {
+            frameUrls = [];
+            for (let i = 0; i < totalFrames; i++) {
+                frameUrls.push(`${baseFolderUrl}${i}.png`);
+            }
+            sliderElement.max = totalFrames - 1;
+        }
+
+        // Preload and cache frames across the network stack to ensure zero stutter
+        function preloadFrameMatrix() {
+            loadingOverlay.style.opacity = '1';
+            loadingOverlay.style.display = 'flex';
+            let loadedCount = 0;
+            cachedImages = [];
+
+            frameUrls.forEach((url, index) => {
+                const img = new Image();
+                img.src = url;
+                img.onload = () => {
+                    loadedCount++;
+                    if (loadedCount === totalFrames) {
+                        // Fade out loading block instantly once cached
+                        loadingOverlay.style.opacity = '0';
+                        setTimeout(() => loadingOverlay.style.display = 'none', 400);
+                        if (isPlaying) startPlaybackEngine();
+                    }
+                };
+                img.onerror = () => {
+                    // Fallback configuration path handling gracefully
+                    loadedCount++;
+                    if (loadedCount === totalFrames) {
+                        loadingOverlay.style.opacity = '0';
+                        setTimeout(() => loadingOverlay.style.display = 'none', 400);
+                    }
+                };
+                cachedImages[index] = img;
+            });
             
-            card.innerHTML = `
-                <h3 class="storm-name">TYPHOON ${storm.name}</h3>
-                <p class="storm-date">${storm.date}</p>
-                <div class="storm-stats">
-                    <div class="stat-box">
-                        <span class="stat-label">Max Winds</span>
-                        <span class="stat-value danger">${storm.winds}</span>
-                    </div>
-                    <div class="stat-box" style="text-align: right;">
-                        <span class="stat-label">Pressure</span>
-                        <span class="stat-value">${storm.pressure}</span>
-                    </div>
-                </div>
-                <button class="btn-view" onclick="loadFeed('${storm.id}', this)">View Track</button>
-            `;
-            stormListContainer.appendChild(card);
-        });
+            // Set initial starting viewpoint frame
+            viewElement.src = frameUrls[0];
+            updateDashboardCounters();
+        }
 
-        // Function to switch the iframe and update the UI
-        function loadFeed(stormId, buttonElement) {
-            const iframe = document.getElementById('weatherFrame');
-            const title = document.getElementById('currentViewTitle');
-            const headerDot = document.getElementById('header-dot');
-
-            // Remove active class from all cards
-            document.querySelectorAll('.storm-card').forEach(c => c.classList.remove('active'));
-
-            if (stormId === 'live') {
-                iframe.src = defaultLiveUrl;
-                title.innerText = "Live Satellite Feed";
-                headerDot.style.background = "#10b981";
-                headerDot.style.boxShadow = "0 0 8px #10b981";
-                headerDot.style.display = "block";
-            } else {
-                const selectedStorm = storms.find(s => s.id === stormId);
-                if (selectedStorm) {
-                    iframe.src = selectedStorm.url;
-                    title.innerText = `Historical Track: ${selectedStorm.name}`;
-                    
-                    // Highlight the selected card
-                    const activeCard = document.getElementById(`card-${stormId}`);
-                    if (activeCard) activeCard.classList.add('active');
-
-                    // Change header dot to historical color (orange)
-                    headerDot.style.background = "#f97316";
-                    headerDot.style.boxShadow = "0 0 8px #f97316";
-                    headerDot.style.display = "none"; // Hide pulsing dot for history
-                }
+        function updateDisplayFrame(index) {
+            if (index >= 0 && index < totalFrames) {
+                currentFrameIndex = index;
+                viewElement.src = frameUrls[currentFrameIndex];
+                sliderElement.value = currentFrameIndex;
+                updateDashboardCounters();
             }
         }
+
+        function updateDashboardCounters() {
+            const displayCurrent = String(currentFrameIndex + 1).padStart(2, '0');
+            const displayTotal = String(totalFrames).padStart(2, '0');
+            counterElement.innerText = `FRAME: ${displayCurrent} / ${displayTotal}`;
+        }
+
+        function startPlaybackEngine() {
+            stopPlaybackEngine();
+            const currentSpeed = parseInt(document.getElementById('speedSelect').value);
+            playbackIntervalId = setInterval(() => {
+                let nextFrame = currentFrameIndex + 1;
+                if (nextFrame >= totalFrames) nextFrame = 0;
+                updateDisplayFrame(nextFrame);
+            }, currentSpeed);
+        }
+
+        function stopPlaybackEngine() {
+            if (playbackIntervalId) {
+                clearInterval(playbackIntervalId);
+                playbackIntervalId = null;
+            }
+        }
+
+        // --- UI Controller Bindings ---
+        playPauseBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                stopPlaybackEngine();
+                playPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+                playPauseBtn.style.boxShadow = 'none';
+            } else {
+                startPlaybackEngine();
+                playPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                playPauseBtn.style.boxShadow = '0 0 12px rgba(56, 189, 248, 0.4)';
+            }
+            isPlaying = !isPlaying;
+        });
+
+        document.getElementById('btnNext').addEventListener('click', () => {
+            stopPlaybackEngine();
+            isPlaying = false;
+            playPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+            let nextFrame = currentFrameIndex + 1;
+            if (nextFrame >= totalFrames) nextFrame = 0;
+            updateDisplayFrame(nextFrame);
+        });
+
+        document.getElementById('btnPrev').addEventListener('click', () => {
+            stopPlaybackEngine();
+            isPlaying = false;
+            playPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+            let prevFrame = currentFrameIndex - 1;
+            if (prevFrame < 0) prevFrame = totalFrames - 1;
+            updateDisplayFrame(prevFrame);
+        });
+
+        sliderElement.addEventListener('input', (e) => {
+            stopPlaybackEngine();
+            isPlaying = false;
+            playPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+            updateDisplayFrame(parseInt(e.target.value));
+        });
+
+        document.getElementById('speedSelect').addEventListener('change', () => {
+            if (isPlaying) startPlaybackEngine();
+        });
+
+        document.getElementById('btnRefresh').addEventListener('click', () => {
+            initializeDashboardEngine();
+        });
+
+        // --- System Clock Implementation ---
+        function updateOperationalClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { hour12: false });
+            const dateString = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+            document.getElementById('live-clock').innerText = `${dateString} | ${timeString} PST`;
+        }
+
+        function initializeDashboardEngine() {
+            generateFrameMatrixUrls();
+            preloadFrameMatrix();
+            // Default icon view initialize matching pause state
+            playPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+        }
+
+        // Execution Hooks
+        setInterval(updateOperationalClock, 1000);
+        updateOperationalClock();
+        initializeDashboardEngine();
     </script>
 </body>
 </html>
