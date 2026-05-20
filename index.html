@@ -48,7 +48,7 @@
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         .clock { font-family: monospace; font-size: 14px; font-weight: 700; color: #94a3b8; }
 
-        /* --- THE CLIPPING CONTAINER --- */
+        /* --- THE CLIPPING MASK --- */
         .viewer-container {
             flex-grow: 1;
             width: 100%;
@@ -61,28 +61,28 @@
         .iframe-crop {
             position: absolute;
             
-            /* 1. TOP CROP: Pushes their top header up out of view */
+            /* 1. TOP CROP: Pushes their header up out of view */
             top: -120px; 
             
-            /* 2. HEAVY LEFT CROP: Shoves the entire left settings menu off the screen */
+            /* 2. THE NEW AD CROP: Shoves the iframe heavily left to hide the ad box */
             left: -320px;
             
-            /* 3. WIDTH ADJUSTMENT: Stretches the frame to fill the massive gap we just made */
+            /* 3. WIDTH FIX: Stretches the frame to fill the space we just created */
             width: calc(100% + 340px);
             
-            /* 4. HEIGHT: Ensures the green timeline stays in the viewport */
+            /* 4. HEIGHT FIX: Ensures the green timeline stays in view */
             height: calc(100% + 150px);
             
             border: none;
         }
 
-        /* --- THE BOTTOM CENSOR BAR --- */
+        /* --- THE BOTTOM MASK --- */
         .bottom-mask {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 50px; /* Swallows the website text beneath the timeline */
+            height: 50px; /* Hides the footer text below the timeline */
             background: #020617;
             z-index: 20;
         }
@@ -95,11 +95,11 @@
             <i class="fa-solid fa-satellite-dish radar-icon"></i>
             <div class="title-block">
                 <h1>Tropical WPAC Infrared Stream</h1>
-                <p>Tarlac PDRRMO | Live Satellite Node</p>
+                <p>Tarlac PDRRMO | CyclonicWX Node</p>
             </div>
         </div>
         <div class="status-block">
-            <div class="live-indicator"><div class="live-dot"></div> FEED SECURED</div>
+            <div class="live-indicator"><div class="live-dot"></div> Live Connection</div>
             <div class="clock" id="live-clock">00:00:00</div>
         </div>
     </div>
