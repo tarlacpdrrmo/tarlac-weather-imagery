@@ -34,86 +34,80 @@
             z-index: 10;
         }
 
-        .brand-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+        .brand-container { display: flex; align-items: center; gap: 15px; }
+        .radar-icon { color: #38bdf8; font-size: 22px; animation: pulse-glowing 2s infinite ease-in-out; }
+        @keyframes pulse-glowing { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 10px #38bdf8; } 100% { transform: scale(1); opacity: 0.8; } }
 
-        .radar-icon {
-            color: #38bdf8;
-            font-size: 22px;
-            animation: pulse-glowing 2s infinite ease-in-out;
-        }
+        .title-block h1 { margin: 0; font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #f1f5f9; }
+        .title-block p { margin: 0; font-size: 10px; color: #38bdf8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        @keyframes pulse-glowing {
-            0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 10px #38bdf8; }
-            100% { transform: scale(1); opacity: 0.8; }
-        }
-
-        .title-block h1 {
-            margin: 0; font-size: 15px; font-weight: 900; 
-            text-transform: uppercase; letter-spacing: 1px;
-            color: #f1f5f9;
-        }
-        .title-block p {
-            margin: 0; font-size: 10px; color: #38bdf8; 
-            font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
-        }
-
-        .status-block {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .live-indicator {
-            display: flex; align-items: center; gap: 8px;
-            background: rgba(56, 189, 248, 0.08);
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            padding: 5px 14px; border-radius: 20px;
-            font-size: 10px; font-weight: 800; color: #38bdf8;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .live-dot {
-            width: 6px; height: 6px; background: #38bdf8;
-            border-radius: 50%; box-shadow: 0 0 8px #38bdf8;
-            animation: blink 1.5s infinite;
-        }
+        .status-block { display: flex; align-items: center; gap: 20px; }
+        .live-indicator { display: flex; align-items: center; gap: 8px; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.3); padding: 5px 14px; border-radius: 20px; font-size: 10px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px; }
+        .live-dot { width: 6px; height: 6px; background: #38bdf8; border-radius: 50%; box-shadow: 0 0 8px #38bdf8; animation: blink 1.5s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .clock { font-family: monospace; font-size: 14px; font-weight: 700; color: #94a3b8; }
 
-        .clock {
-            font-family: monospace; font-size: 14px; font-weight: 700; color: #94a3b8;
-        }
-
-        /* --- THE MAGIC PICTURE FRAME --- */
+        /* --- Embed Container (Zero Margins) --- */
         .viewer-container {
             flex-grow: 1;
             width: 100%;
             position: relative;
             background: #000000;
-            overflow: hidden; /* This acts like the crop tool, hiding anything outside this box */
+            overflow: hidden; 
         }
 
-        /* --- THE CSS CROP HACK --- */
+        /* --- THE AGGRESSIVE CROP HACK --- */
         .iframe-crop {
             position: absolute;
+            top: -65px;   /* Pushes Orange Box UP out of view */
+            left: -15px;  /* Pushes left margin OUT of view */
+            width: calc(100% + 30px);  /* Stretches right margin OUT of view */
             
-            /* TWEAK THESE NUMBERS TO PERFECT THE CROP */
-            top: -110px;        /* Pushes their website UP to hide their top menu */
-            left: -15px;        /* Pushes their website LEFT to hide their side margins */
-            
-            /* Stretches the frame to fill the gaps created by pulling it up and left */
-            width: calc(100% + 30px);   
-            height: calc(100% + 150px); 
+            /* TO GET THEIR GREEN BOX BACK: Change 130px to 65px below */
+            height: calc(100% + 130px); 
             
             border: none;
-            
-            /* Optional: Allows you to zoom slightly if the map is too small */
-            /* transform: scale(1.1); */
         }
+
+        /* --- Custom UI Control Bar (Visual Only) --- */
+        .custom-controls {
+            background: #0f172a;
+            border-top: 1px solid rgba(56, 189, 248, 0.2);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.6);
+            z-index: 10;
+        }
+
+        .ctrl-group { display: flex; align-items: center; gap: 15px; }
+
+        .btn-ctrl {
+            background: #1e293b; border: 1px solid rgba(255,255,255,0.05); color: #cbd5e1;
+            width: 40px; height: 40px; border-radius: 8px; cursor: pointer; transition: 0.2s;
+        }
+        .btn-ctrl:hover { background: #334155; color: #38bdf8; border-color: rgba(56, 189, 248, 0.3); }
+        
+        .btn-play {
+            background: #38bdf8; color: #0f172a; width: 45px; height: 45px; border-radius: 50%; 
+            font-size: 16px; border: none; font-weight: 900; box-shadow: 0 0 12px rgba(56, 189, 248, 0.4); cursor: pointer; transition: 0.2s;
+        }
+        .btn-play:hover { background: #7dd3fc; transform: scale(1.05); }
+
+        .timeline-track {
+            flex-grow: 1; margin: 0 30px; height: 6px; background: #1e293b; border-radius: 3px; position: relative;
+        }
+        .timeline-fill {
+            position: absolute; left: 0; top: 0; height: 100%; width: 40%; background: #38bdf8; border-radius: 3px; box-shadow: 0 0 10px #38bdf8;
+        }
+        .timeline-thumb {
+            position: absolute; left: 40%; top: -4px; width: 14px; height: 14px; background: #fff; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5); transform: translateX(-50%);
+        }
+
+        .speed-label { font-size: 10px; font-weight: 700; color: #64748b; letter-spacing: 1px; }
+        .speed-val { font-size: 12px; font-weight: 800; color: #f8fafc; background: #1e293b; padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); }
+
     </style>
 </head>
 <body>
@@ -136,6 +130,23 @@
         <iframe class="iframe-crop" src="https://cyclonicwx.com/floater/wpac/ir/" scrolling="no"></iframe>
     </div>
 
+    <div class="custom-controls">
+        <div class="ctrl-group">
+            <button class="btn-ctrl" onclick="alert('CORS SECURITY BLOCK: Custom HTML buttons cannot control an external iframe. Use the native controls to play.')"><i class="fa-solid fa-backward-step"></i></button>
+            <button class="btn-play" onclick="alert('CORS SECURITY BLOCK: Custom HTML buttons cannot control an external iframe. Use the native controls to play.')"><i class="fa-solid fa-play"></i></button>
+            <button class="btn-ctrl" onclick="alert('CORS SECURITY BLOCK: Custom HTML buttons cannot control an external iframe. Use the native controls to play.')"><i class="fa-solid fa-forward-step"></i></button>
+        </div>
+        
+        <div class="timeline-track">
+            <div class="timeline-fill"></div>
+            <div class="timeline-thumb"></div>
+        </div>
+
+        <div class="ctrl-group">
+            <span class="speed-label">SPEED</span>
+            <div class="speed-val">1.0x</div>
+        </div>
+    </div>
     <script>
         // --- System Clock Implementation ---
         function updateOperationalClock() {
