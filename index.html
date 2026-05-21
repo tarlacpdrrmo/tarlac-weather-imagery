@@ -11,10 +11,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <style>
-       body, html { 
+        body, html { 
             margin: 0; padding: 0; 
             font-family: 'Inter', sans-serif; 
-            background-color: #2b2b2b; /* Updated to blend with the iframe */
+            background-color: #2b2b2b; 
             color: #f8fafc;
             height: 100vh; width: 100vw;
             overflow: hidden;
@@ -48,38 +48,51 @@
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         .clock { font-family: monospace; font-size: 14px; font-weight: 700; color: #94a3b8; }
 
-     /* --- THE CLIPPING MASK --- */
+        /* --- THE CLIPPING MASK --- */
         .viewer-container {
             flex-grow: 1;
             width: 100%;
-            background: #303030; /* Updated to blend with the iframe */
+            background: #303030; 
             position: relative;
             overflow: hidden; 
+            cursor: grab; /* Adds the open hand cursor */
         }
-       /* --- THE IFRAME MANIPULATION --- */
-        .iframe-crop {
-            position: absolute;
-            
-            width: 1600px; 
-            height: 1000px;
-            
-            top: 50%;
-            left: 50%;
-            
-            /* Lowered the Y-axis from -54% to -51% to bring the top of the map into view */
-            transform: translate(-40%, -50%) scale(1.0);
-            border: none;
+        
+        .viewer-container.dragging {
+            cursor: grabbing; /* Changes to closed fist when actively dragging */
         }
 
-       /* --- THE BOTTOM MASK --- */
+        /* --- THE PAN & ZOOM WRAPPER --- */
+        .pan-zoom-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            transform-origin: 0 0; /* Crucial for calculating mouse wheel zoom accurately */
+        }
+
+        /* --- THE IFRAME MANIPULATION --- */
+        .iframe-crop {
+            position: absolute;
+            width: 1600px; 
+            height: 1000px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-40%, -50%) scale(1.0);
+            border: none;
+            /* Prevents the iframe from stealing our mouse clicks */
+            pointer-events: none; 
+        }
+
+        /* --- THE BOTTOM MASK --- */
         .bottom-mask {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
             height: 50px; 
-            background: #303030; /* Updated to blend with the iframe */
+            background: #303030; 
             z-index: 20;
+            pointer-events: none; /* Ensures we can still scroll if the mouse is over the mask */
         }
     </style>
 </head>
@@ -99,12 +112,13 @@
         </div>
     </div>
 
-    <div class="viewer-container">
+    <div class="viewer-container" id="viewer-container">
         
-        <iframe class="iframe-crop" src="https://cyclonicwx.com/floater/nwpac/ir/" scrolling="no"></iframe>
+        <div class="pan-zoom-container" id="pan-zoom-container">
+            <iframe class="iframe-crop" src="https://cyclonicwx.com/floater/nwpac/ir/" scrolling="no"></iframe>
+        </div>
         
         <div class="bottom-mask"></div>
-
     </div>
 
     <script>
@@ -117,6 +131,77 @@
         }
         setInterval(updateOperationalClock, 1000);
         updateOperationalClock();
+
+        // Pan and Zoom Logic
+        const viewer = document.getElementById('viewer-container');
+        const mapLayer = document.getElementById('pan-zoom-container');
+
+        let scale = 1;
+        let pointX = 0;
+        let pointY = 0;
+        let startX = 0;
+        let startY = 0;
+        let isPanning = false;
+
+        // 1. Zoom with Mouse Wheel
+        viewer.addEventListener('wheel', (e) => {
+            e.preventDefault(); // Prevents the whole webpage from scrolling
+            
+            // Calculate mouse position relative to the current scale
+            const xs = (e.clientX - pointX) / scale;
+            const ys = (e.clientY - pointY) / scale;
+
+            // Determine zoom direction (in or out)
+            const delta = Math.sign(e.deltaY);
+            if (delta > 0) {
+                scale *= 0.9; // Zoom out
+            } else {
+                scale *= 1.1; // Zoom in
+            }
+
+            // Restrict zoom limits (don't zoom out too far, don't zoom in too tight)
+            scale = Math.min(Math.max(0.5, scale), 4);
+
+            // Re-adjust the coordinates to zoom exactly where the mouse pointer is
+            pointX = e.clientX - xs * scale;
+            pointY = e.clientY - ys * scale;
+
+            mapLayer.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+        });
+
+        // 2. Pan Map Start (Mouse Down)
+        viewer.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            isPanning = true;
+            viewer.classList.add('dragging'); // Triggers the CSS grabbing fist
+            
+            // Record where the user grabbed the map
+            startX = e.clientX - pointX;
+            startY = e.clientY - pointY;
+        });
+
+        // 3. Pan Map Moving (Mouse Move)
+        viewer.addEventListener('mousemove', (e) => {
+            if (!isPanning) return;
+            e.preventDefault();
+            
+            // Calculate new position
+            pointX = e.clientX - startX;
+            pointY = e.clientY - startY;
+            
+            mapLayer.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+        });
+
+        // 4. Pan Map End (Mouse Up or Leaving map area)
+        viewer.addEventListener('mouseup', () => {
+            isPanning = false;
+            viewer.classList.remove('dragging');
+        });
+        
+        viewer.addEventListener('mouseleave', () => {
+            isPanning = false;
+            viewer.classList.remove('dragging');
+        });
     </script>
 </body>
 </html>
