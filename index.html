@@ -57,24 +57,18 @@
             overflow: hidden; 
         }
 
-        /* --- THE IFRAME MANIPULATION --- */
+       /* --- THE IFRAME MANIPULATION --- */
         .iframe-crop {
             position: absolute;
             
-            /* 1. Force a massive, fixed canvas so the source layout never collapses */
             width: 1600px; 
             height: 1000px;
             
-            /* 2. Anchor the exact center of the iframe to the exact center of the screen */
             top: 50%;
             left: 50%;
             
-            /* 3. THE FIX: 
-                  - X (-40%): Shifts it slightly left to hide the ad box, but keeps the left edge of the map intact.
-                  - Y (-54%): Pushes it up to hide the top header.
-                  - Scale (1.4): Zooms in dramatically to fill the screen.
-            */
-            transform: translate(-40%, -54%) scale(1.4);
+            /* Lowered the Y-axis from -54% to -51% to bring the top of the map into view */
+            transform: translate(-40%, -51%) scale(1.4);
             border: none;
         }
 
