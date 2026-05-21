@@ -68,7 +68,6 @@
             height: 100%;
             position: absolute;
             transform-origin: 0 0; 
-            /* Kept normally without transition so panning feels instant */
         }
 
         /* --- THE IFRAME MANIPULATION --- */
@@ -95,40 +94,80 @@
             pointer-events: none; 
         }
 
-        /* --- FLOATING CONTROLS --- */
-        .map-controls {
-            position: absolute;
-            bottom: 70px; /* Placed just above the bottom mask */
-            right: 20px;
-            z-index: 60;
-        }
-
+        /* --- MODERN GHOST RESET BUTTON (Top Right) --- */
         .control-btn {
-            background: rgba(15, 23, 42, 0.85);
-            border: 1px solid rgba(56, 189, 248, 0.4);
-            color: #38bdf8;
-            border-radius: 8px;
-            width: 44px;
-            height: 44px;
-            font-size: 18px;
+            position: absolute;
+            top: 80px; /* Highly visible, below top-bar branding */
+            right: 25px;
+            z-index: 60;
+            
+            /* Ghost Button Styling */
+            background: rgba(255, 255, 255, 0.03); 
+            border: 1px solid rgba(248, 250, 252, 0.15); 
+            color: rgba(241, 245, 249, 0.9); 
+            border-radius: 24px;
+            
+            /* Sizing & Positioning */
+            width: 48px;
+            height: 48px;
+            
+            /* Modern Layout */
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            backdrop-filter: blur(4px);
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            transition: all 0.25s ease-out;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
         .control-btn:hover {
-            background: rgba(56, 189, 248, 0.2);
-            transform: scale(1.05);
-            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.05); /* Soft Blue Tint */
+            border-color: rgba(56, 189, 248, 0.5); /* Blue Border */
+            color: #38bdf8;
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5), 0 0 8px rgba(56, 189, 248, 0.2);
         }
 
         .control-btn:active {
-            transform: scale(0.95);
+            transform: scale(0.97);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
+        
+        /* Modern Internal Reset Icon (Pulsing Halo) */
+        .reset-icon-halo {
+            width: 8px;
+            height: 8px;
+            background: rgba(241, 245, 249, 0.8);
+            border-radius: 50%;
+            position: relative;
+            transition: all 0.25s ease-out;
+        }
+        
+        .control-btn:hover .reset-icon-halo {
+            background: #38bdf8;
+        }
+
+        .reset-icon-halo::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
+            border: 1px solid currentColor;
+            border-radius: 50%;
+            animation: radar-halo 1.5s infinite;
+            opacity: 0;
+            transition: all 0.25s ease-out;
+        }
+        
+        @keyframes radar-halo {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+            30% { opacity: 0.5; }
+            100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+        }
+
     </style>
 </head>
 <body>
@@ -155,11 +194,9 @@
         
         <div class="bottom-mask"></div>
 
-        <div class="map-controls">
-            <button class="control-btn" id="reset-btn" title="Reset Default View">
-                <i class="fa-solid fa-expand"></i>
-            </button>
-        </div>
+        <button class="control-btn" id="reset-btn" title="Reset Default View">
+            <div class="reset-icon-halo"></div>
+        </button>
 
     </div>
 
@@ -241,25 +278,21 @@
         });
 
         // 5. Reset Button Logic
-        // Prevent clicking the button from initiating a map pan
         resetBtn.addEventListener('mousedown', (e) => {
             e.stopPropagation(); 
         });
 
         resetBtn.addEventListener('click', () => {
-            // Reset to defaults
             scale = 1;
             pointX = 0;
             pointY = 0;
 
-            // Temporarily add a smooth CSS transition for the reset animation
-            mapLayer.style.transition = 'transform 0.3s ease-in-out';
+            mapLayer.style.transition = 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)'; /* Modern Easing */
             mapLayer.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
 
-            // Remove the transition after 300ms so standard panning isn't slowed down
             setTimeout(() => {
                 mapLayer.style.transition = 'none';
-            }, 300);
+            }, 350);
         });
     </script>
 </body>
