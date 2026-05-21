@@ -48,19 +48,19 @@
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         .clock { font-family: monospace; font-size: 14px; font-weight: 700; color: #94a3b8; }
 
-        /* --- THE CLIPPING MASK --- */
+        /* --- VIEWER MAIN AREA --- */
         .viewer-container {
             flex-grow: 1;
             width: 100%;
             background: #303030; 
             position: relative;
             overflow: hidden; 
-            cursor: grab; 
         }
-        
-        .viewer-container.dragging {
-            cursor: grabbing; 
-        }
+
+        /* Tool Cursors */
+        .viewer-container.tool-pan { cursor: grab; }
+        .viewer-container.tool-pan.dragging { cursor: grabbing; }
+        .viewer-container.tool-pointer { cursor: default; }
 
         /* --- THE PAN & ZOOM WRAPPER --- */
         .pan-zoom-container {
@@ -79,8 +79,11 @@
             left: 50%;
             transform: translate(-50%, -50%) scale(1.0);
             border: none;
-            pointer-events: none; 
         }
+
+        /* Allow clicking iframe only in pointer mode */
+        .viewer-container.tool-pan .iframe-crop { pointer-events: none; }
+        .viewer-container.tool-pointer .iframe-crop { pointer-events: auto; }
 
         /* --- THE BOTTOM MASK --- */
         .bottom-mask {
@@ -94,57 +97,73 @@
             pointer-events: none; 
         }
 
-        /* --- MODERN GHOST RESET BUTTON (Top Right) --- */
-        .control-btn {
+        /* --- SIDEBAR TOOLBAR --- */
+        .sidebar-toolbar {
             position: absolute;
-            top: 80px; /* Highly visible, below top-bar branding */
-            right: 25px;
+            top: 20px;
+            left: 20px;
             z-index: 60;
-            
-            /* Ghost Button Styling */
+            background: rgba(15, 23, 42, 0.85); 
+            border: 1px solid rgba(56, 189, 248, 0.2); 
+            border-radius: 12px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .tool-btn {
             background: rgba(255, 255, 255, 0.03); 
-            border: 1px solid rgba(248, 250, 252, 0.15); 
-            color: rgba(241, 245, 249, 0.9); 
-            border-radius: 24px;
-            
-            /* Sizing & Positioning */
-            width: 48px;
-            height: 48px;
-            
-            /* Modern Layout */
+            border: 1px solid transparent; 
+            color: rgba(241, 245, 249, 0.6); 
+            border-radius: 8px;
+            width: 44px;
+            height: 44px;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            backdrop-filter: blur(5px);
-            transition: all 0.25s ease-out;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.2s ease-out;
+            font-size: 16px;
         }
 
-        .control-btn:hover {
-            background: rgba(56, 189, 248, 0.05); /* Soft Blue Tint */
-            border-color: rgba(56, 189, 248, 0.5); /* Blue Border */
+        .tool-btn:hover {
+            background: rgba(56, 189, 248, 0.1); 
             color: #38bdf8;
-            transform: translateY(-2px) scale(1.03);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.5), 0 0 8px rgba(56, 189, 248, 0.2);
+            transform: translateY(-1px);
         }
 
-        .control-btn:active {
-            transform: scale(0.97);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        .tool-btn:active {
+            transform: scale(0.95);
         }
-        
-        /* Modern Internal Reset Icon (Pulsing Halo) */
+
+        /* Active Tool State */
+        .tool-btn.active {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: rgba(56, 189, 248, 0.4);
+            color: #38bdf8;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
+        }
+
+        .toolbar-divider {
+            height: 1px;
+            background: rgba(56, 189, 248, 0.2);
+            margin: 2px 4px;
+        }
+
+        /* Reset Icon (Pulsing Halo) inside toolbar */
         .reset-icon-halo {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             background: rgba(241, 245, 249, 0.8);
             border-radius: 50%;
             position: relative;
             transition: all 0.25s ease-out;
         }
         
-        .control-btn:hover .reset-icon-halo {
+        .tool-btn:hover .reset-icon-halo {
             background: #38bdf8;
         }
 
@@ -153,19 +172,30 @@
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             border: 1px solid currentColor;
             border-radius: 50%;
             animation: radar-halo 1.5s infinite;
             opacity: 0;
-            transition: all 0.25s ease-out;
         }
         
         @keyframes radar-halo {
             0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
             30% { opacity: 0.5; }
             100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+        }
+
+        /* Camera Flash Effect overlay */
+        #camera-flash {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: white;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease-out;
         }
 
     </style>
@@ -186,17 +216,36 @@
         </div>
     </div>
 
-    <div class="viewer-container" id="viewer-container">
+    <!-- Defaulting to Pointer Tool -->
+    <div class="viewer-container tool-pointer" id="viewer-container">
         
+        <!-- SIDEBAR TOOLBAR -->
+        <div class="sidebar-toolbar">
+            <button class="tool-btn active" id="btn-pointer" title="Pointer Tool (Click Mode)">
+                <i class="fa-solid fa-arrow-pointer"></i>
+            </button>
+            <button class="tool-btn" id="btn-pan" title="Pan Tool (Grab Map)">
+                <i class="fa-solid fa-hand"></i>
+            </button>
+            <button class="tool-btn" id="btn-snapshot" title="Take Snapshot">
+                <i class="fa-solid fa-camera"></i>
+            </button>
+            
+            <div class="toolbar-divider"></div>
+            
+            <button class="tool-btn" id="btn-reset" title="Reset View to Default">
+                <div class="reset-icon-halo"></div>
+            </button>
+        </div>
+
         <div class="pan-zoom-container" id="pan-zoom-container">
             <iframe class="iframe-crop" src="https://cyclonicwx.com/floater/nwpac/ir/" scrolling="no"></iframe>
         </div>
         
         <div class="bottom-mask"></div>
-
-        <button class="control-btn" id="reset-btn" title="Reset Default View">
-            <div class="reset-icon-halo"></div>
-        </button>
+        
+        <!-- Flash overlay for snapshot tool -->
+        <div id="camera-flash"></div>
 
     </div>
 
@@ -211,11 +260,19 @@
         setInterval(updateOperationalClock, 1000);
         updateOperationalClock();
 
-        // Pan and Zoom Logic
+        // --- View & Tool Logic ---
         const viewer = document.getElementById('viewer-container');
         const mapLayer = document.getElementById('pan-zoom-container');
-        const resetBtn = document.getElementById('reset-btn');
+        
+        // Toolbar Buttons
+        const btnPointer = document.getElementById('btn-pointer');
+        const btnPan = document.getElementById('btn-pan');
+        const btnSnapshot = document.getElementById('btn-snapshot');
+        const btnReset = document.getElementById('btn-reset');
+        const cameraFlash = document.getElementById('camera-flash');
 
+        // State Variables
+        let currentTool = 'pointer'; // 'pointer' or 'pan'
         let scale = 1;
         let pointX = 0;
         let pointY = 0;
@@ -223,7 +280,23 @@
         let startY = 0;
         let isPanning = false;
 
-        // 1. Zoom with Mouse Wheel
+        // --- Tool Switching Logic ---
+        function setTool(tool) {
+            currentTool = tool;
+            
+            // Toggle Active Classes on buttons
+            btnPointer.classList.toggle('active', tool === 'pointer');
+            btnPan.classList.toggle('active', tool === 'pan');
+
+            // Toggle Viewer Classes for Cursor/Iframe states
+            viewer.classList.remove('tool-pointer', 'tool-pan');
+            viewer.classList.add(`tool-${tool}`);
+        }
+
+        btnPointer.addEventListener('click', () => setTool('pointer'));
+        btnPan.addEventListener('click', () => setTool('pan'));
+
+        // --- Zooming (Works regardless of tool) ---
         viewer.addEventListener('wheel', (e) => {
             e.preventDefault(); 
             
@@ -245,8 +318,10 @@
             mapLayer.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
         });
 
-        // 2. Pan Map Start (Mouse Down)
+        // --- Panning (Only works if currentTool === 'pan') ---
         viewer.addEventListener('mousedown', (e) => {
+            if (currentTool !== 'pan') return; 
+            
             e.preventDefault();
             isPanning = true;
             viewer.classList.add('dragging'); 
@@ -255,9 +330,8 @@
             startY = e.clientY - pointY;
         });
 
-        // 3. Pan Map Moving (Mouse Move)
         viewer.addEventListener('mousemove', (e) => {
-            if (!isPanning) return;
+            if (!isPanning || currentTool !== 'pan') return;
             e.preventDefault();
             
             pointX = e.clientX - startX;
@@ -266,34 +340,44 @@
             mapLayer.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
         });
 
-        // 4. Pan Map End (Mouse Up / Leave)
-        viewer.addEventListener('mouseup', () => {
+        const stopPanning = () => {
             isPanning = false;
             viewer.classList.remove('dragging');
-        });
-        
-        viewer.addEventListener('mouseleave', () => {
-            isPanning = false;
-            viewer.classList.remove('dragging');
-        });
+        };
 
-        // 5. Reset Button Logic
-        resetBtn.addEventListener('mousedown', (e) => {
-            e.stopPropagation(); 
-        });
+        viewer.addEventListener('mouseup', stopPanning);
+        viewer.addEventListener('mouseleave', stopPanning);
 
-        resetBtn.addEventListener('click', () => {
+        // --- Reset Logic ---
+        btnReset.addEventListener('mousedown', (e) => { e.stopPropagation(); });
+        btnReset.addEventListener('click', () => {
             scale = 1;
             pointX = 0;
             pointY = 0;
 
-            mapLayer.style.transition = 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)'; /* Modern Easing */
+            mapLayer.style.transition = 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)'; 
             mapLayer.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
 
-            setTimeout(() => {
-                mapLayer.style.transition = 'none';
-            }, 350);
+            setTimeout(() => { mapLayer.style.transition = 'none'; }, 350);
         });
+
+        // --- Snapshot Logic ---
+        btnSnapshot.addEventListener('click', () => {
+            // Trigger visual flash
+            cameraFlash.style.transition = 'none';
+            cameraFlash.style.opacity = '0.8';
+            
+            setTimeout(() => {
+                cameraFlash.style.transition = 'opacity 0.6s ease-out';
+                cameraFlash.style.opacity = '0';
+            }, 50);
+
+            // Display note to user (Cross-Origin iframes block real canvas captures natively)
+            setTimeout(() => {
+                alert("Snapshot Triggered.\n\nNote: Because the stream originates from a cross-origin source (CyclonicWX), native browser screenshot capture is restricted by security protocols. In a production environment, this would hit a secure proxy backend.");
+            }, 100);
+        });
+
     </script>
 </body>
 </html>
