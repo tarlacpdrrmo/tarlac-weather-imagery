@@ -48,7 +48,7 @@
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         .clock { font-family: monospace; font-size: 14px; font-weight: 700; color: #94a3b8; }
 
-       /* --- THE CLIPPING MASK --- */
+      /* --- THE CLIPPING MASK --- */
         .viewer-container {
             flex-grow: 1;
             width: 100%;
@@ -61,20 +61,20 @@
         .iframe-crop {
             position: absolute;
             
-            /* 1. Force a fixed large resolution so the source site layout doesn't collapse */
-            width: 1500px;
+            /* 1. Force a massive, fixed canvas so the source layout never collapses */
+            width: 1600px; 
             height: 1000px;
             
-            /* 2. Anchor the iframe to the exact center of your container */
+            /* 2. Anchor the exact center of the iframe to the exact center of the screen */
             top: 50%;
             left: 50%;
             
-            /* 3. THE MAGIC TRICK: 
-                  - translate(-62%, -50%) shifts it left to hide controls/ads, and up to hide the header.
-                  - scale(1.45) zooms the whole thing in by 45% to make it much larger!
+            /* 3. THE FIX: 
+                  - X (-40%): Shifts it slightly left to hide the ad box, but keeps the left edge of the map intact.
+                  - Y (-54%): Pushes it up to hide the top header.
+                  - Scale (1.4): Zooms in dramatically to fill the screen.
             */
-            transform: translate(-62%, -50%) scale(1.45);
-            
+            transform: translate(-40%, -54%) scale(1.4);
             border: none;
         }
 
