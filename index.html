@@ -185,19 +185,6 @@
             30% { opacity: 0.5; }
             100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
         }
-
-        /* Camera Flash Effect overlay */
-        #camera-flash {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: white;
-            z-index: 9999;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.4s ease-out;
-        }
-
     </style>
 </head>
 <body>
@@ -227,9 +214,6 @@
             <button class="tool-btn" id="btn-pan" title="Pan Tool (Grab Map)">
                 <i class="fa-solid fa-hand"></i>
             </button>
-            <button class="tool-btn" id="btn-snapshot" title="Take Snapshot">
-                <i class="fa-solid fa-camera"></i>
-            </button>
             
             <div class="toolbar-divider"></div>
             
@@ -243,9 +227,6 @@
         </div>
         
         <div class="bottom-mask"></div>
-        
-        <!-- Flash overlay for snapshot tool -->
-        <div id="camera-flash"></div>
 
     </div>
 
@@ -267,9 +248,7 @@
         // Toolbar Buttons
         const btnPointer = document.getElementById('btn-pointer');
         const btnPan = document.getElementById('btn-pan');
-        const btnSnapshot = document.getElementById('btn-snapshot');
         const btnReset = document.getElementById('btn-reset');
-        const cameraFlash = document.getElementById('camera-flash');
 
         // State Variables
         let currentTool = 'pointer'; // 'pointer' or 'pan'
@@ -310,10 +289,17 @@
                 scale *= 1.1; 
             }
 
-            scale = Math.min(Math.max(0.5, scale), 4);
+            // Lock zoom out: Minimum scale is strictly 1
+            scale = Math.min(Math.max(1, scale), 4);
 
-            pointX = e.clientX - xs * scale;
-            pointY = e.clientY - ys * scale;
+            if (scale === 1) {
+                // If fully zoomed out to default, snap coordinates back to dead center
+                pointX = 0;
+                pointY = 0;
+            } else {
+                pointX = e.clientX - xs * scale;
+                pointY = e.clientY - ys * scale;
+            }
 
             mapLayer.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
         });
@@ -322,6 +308,9 @@
         viewer.addEventListener('mousedown', (e) => {
             if (currentTool !== 'pan') return; 
             
+            // Prevent dragging the map away if we are fully zoomed out
+            if (scale === 1) return;
+
             e.preventDefault();
             isPanning = true;
             viewer.classList.add('dragging'); 
@@ -359,23 +348,6 @@
             mapLayer.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
 
             setTimeout(() => { mapLayer.style.transition = 'none'; }, 350);
-        });
-
-        // --- Snapshot Logic ---
-        btnSnapshot.addEventListener('click', () => {
-            // Trigger visual flash
-            cameraFlash.style.transition = 'none';
-            cameraFlash.style.opacity = '0.8';
-            
-            setTimeout(() => {
-                cameraFlash.style.transition = 'opacity 0.6s ease-out';
-                cameraFlash.style.opacity = '0';
-            }, 50);
-
-            // Display note to user (Cross-Origin iframes block real canvas captures natively)
-            setTimeout(() => {
-                alert("Snapshot Triggered.\n\nNote: Because the stream originates from a cross-origin source (CyclonicWX), native browser screenshot capture is restricted by security protocols. In a production environment, this would hit a secure proxy backend.");
-            }, 100);
         });
 
     </script>
